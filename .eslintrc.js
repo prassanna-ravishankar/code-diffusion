@@ -26,5 +26,13 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'error',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
   },
-  ignorePatterns: ['dist', 'node_modules', '*.js'],
+  ignorePatterns: ['dist', 'node_modules', '*.js', '**/*.d.ts', 'tests'],
+  overrides: [
+    {
+      files: ['src/scripts/**/*.ts'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
+  ],
 };
