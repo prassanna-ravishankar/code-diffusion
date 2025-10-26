@@ -76,7 +76,7 @@
         "dependencies": [
           1
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -84,7 +84,7 @@
             "description": "Create the primary Workflows database in Notion with all required properties including title, request, status, stage, repos, timestamps, and relations to stage pages",
             "dependencies": [],
             "details": "Using Notion API v2022-06-28, create Workflows database with properties: title (title type), request (rich_text), status (select with options: pending/bootstrapping/planning/implementing/complete/blocked), stage (select), repos (multi_select), created_date and updated_date (date properties), and establish relation property to Stage Pages database. Configure proper property types and validation rules.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Verify database creation via API, test all property types are correct, validate select options are properly configured, and confirm relation setup works"
           },
           {
@@ -95,7 +95,7 @@
               1
             ],
             "details": "Create Stage Pages database with properties: workflow relation (linking back to Workflows DB), stage_type (select), status (select), content (rich_text), workflow_spec (rich_text formatted as JSON), and subagent_tasks relation. Ensure bidirectional relations work properly between Workflows and Stage Pages databases. Configure proper permissions and access controls.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test bidirectional relations between Workflows and Stage Pages, verify JSON storage in workflow_spec property, and validate all property types function correctly"
           },
           {
@@ -106,7 +106,7 @@
               2
             ],
             "details": "Implement Subagent Tasks database with properties: parent_page relation (to Stage Pages), task_type (text), status (select), repos (multi_select), worktree (text), skills (multi_select), mcps (multi_select), output (rich_text), git_refs (rich_text formatted as JSON). Configure proper relation hierarchies and ensure data integrity across all three databases.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify relations to Stage Pages work correctly, test JSON storage in git_refs property, validate multi-select properties function properly, and confirm data flows correctly through the database hierarchy"
           },
           {
@@ -117,7 +117,7 @@
               3
             ],
             "details": "Create database templates for bootstrapping, planning, and implementing stages with pre-filled placeholders and proper formatting. Implement validation logic to ensure data consistency across all three databases. Create helper functions for template instantiation and validation checks. Add documentation for proper database usage and template guidelines.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test template creation and instantiation for each stage type, verify validation rules prevent invalid data entry, confirm templates populate with correct placeholders, and validate end-to-end database workflow"
           }
         ]
@@ -132,7 +132,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -140,7 +140,7 @@
             "description": "Set up the base NotionService class structure with proper initialization and configuration management for the Notion API client",
             "dependencies": [],
             "details": "Create NotionService class with constructor that initializes @notionhq/client SDK. Add environment configuration loading for NOTION_API_KEY and database IDs. Implement basic class structure with private client instance and configuration validation. Set up TypeScript class with proper exports and imports.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Unit tests for class instantiation, configuration validation, and SDK initialization"
           },
           {
@@ -1616,7 +1616,7 @@
     ],
     "metadata": {
       "created": "2025-10-26T20:27:18.098Z",
-      "updated": "2025-10-26T20:47:37.121Z",
+      "updated": "2025-10-26T21:01:20.300Z",
       "description": "Tasks for master context"
     }
   }
