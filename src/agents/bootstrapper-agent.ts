@@ -6,6 +6,7 @@
 import { BaseAgent, type BaseAgentConfig } from './base-agent';
 import Anthropic from '@anthropic-ai/sdk';
 import { NotionCRUDService } from '../services/notion-crud.service';
+import { CodebaseScanner, type ScanResult, type ScannedFile } from './codebase-scanner';
 
 export interface BootstrapperConfig extends BaseAgentConfig {
   codebasePath?: string;
@@ -49,6 +50,7 @@ export class BootstrapperAgent extends BaseAgent {
   private anthropic: Anthropic;
   private notionService: NotionCRUDService;
   private bootstrapperConfig: BootstrapperConfig;
+  private scanner: CodebaseScanner;
 
   constructor(config: BootstrapperConfig) {
     super(config);
@@ -65,6 +67,13 @@ export class BootstrapperAgent extends BaseAgent {
       workflowsDbId: process.env['NOTION_WORKFLOWS_DB_ID'] || '',
       stagePagesDbId: process.env['NOTION_STAGE_PAGES_DB_ID'] || '',
       subagentTasksDbId: process.env['NOTION_SUBAGENT_TASKS_DB_ID'] || '',
+    });
+
+    // Initialize codebase scanner
+    this.scanner = new CodebaseScanner({
+      maxDepth: config.maxAnalysisDepth || 10,
+      respectGitignore: true,
+      maxFileSize: 10 * 1024 * 1024, // 10MB
     });
 
     this.logger.info('BootstrapperAgent initialized', {
@@ -92,8 +101,8 @@ export class BootstrapperAgent extends BaseAgent {
       const featureRequest = await this.fetchFeatureRequest();
       this.logger.info('Feature request fetched', { length: featureRequest.length });
 
-      // Step 2: Analyze codebase (to be implemented in next subtasks)
-      const codebaseContext = this.analyzeCodebase();
+      // Step 2: Analyze codebase
+      const codebaseContext = await this.analyzeCodebase();
       this.logger.info('Codebase analysis complete', { context: codebaseContext });
 
       // Step 3: Generate workflow specification using Claude
@@ -135,16 +144,59 @@ export class BootstrapperAgent extends BaseAgent {
 
   /**
    * Analyze codebase to extract context
-   * This is a placeholder - will be implemented in subtasks 5.2-5.4
+   * Scans files and categorizes them
    */
-  private analyzeCodebase(): CodebaseContext {
+  private async analyzeCodebase(): Promise<CodebaseContext> {
     this.logger.info('Analyzing codebase', {
       path: this.bootstrapperConfig.codebasePath,
       depth: this.bootstrapperConfig.maxAnalysisDepth,
     });
 
-    // Placeholder implementation
-    // Will be replaced with actual file scanning, AST parsing, and dependency analysis
+    if (!this.bootstrapperConfig.codebasePath) {
+      this.logger.warn('No codebase path provided, using placeholder context');
+      return this.getPlaceholderContext();
+    }
+
+    try {
+      // Scan the codebase
+      const scanResult = await this.scanner.scan(this.bootstrapperConfig.codebasePath);
+
+      // Get key files
+      const keyFiles = this.scanner.getKeyFiles(scanResult);
+
+      // Detect languages and frameworks
+      const languages = this.detectLanguages(scanResult);
+      const frameworks = await this.detectFrameworks(scanResult, keyFiles);
+      const dependencies = await this.extractDependencies(keyFiles);
+
+      // Determine architecture patterns
+      const patterns = this.detectPatterns(scanResult);
+      const architecture = this.inferArchitecture(scanResult, patterns);
+
+      this.logger.info('Codebase analysis complete', {
+        totalFiles: scanResult.totalFiles,
+        languages,
+        frameworks,
+      });
+
+      return {
+        languages,
+        frameworks,
+        patterns,
+        keyFiles: keyFiles.map((f) => f.relativePath),
+        dependencies,
+        architecture,
+      };
+    } catch (error) {
+      this.logger.error('Error analyzing codebase', { error });
+      return this.getPlaceholderContext();
+    }
+  }
+
+  /**
+   * Get placeholder context when codebase path is not provided
+   */
+  private getPlaceholderContext(): CodebaseContext {
     return {
       languages: ['TypeScript', 'JavaScript'],
       frameworks: ['Node.js', 'Express'],
@@ -153,6 +205,168 @@ export class BootstrapperAgent extends BaseAgent {
       dependencies: {},
       architecture: 'Microservices',
     };
+  }
+
+  /**
+   * Detect programming languages from scan result
+   */
+  private detectLanguages(scanResult: ScanResult): string[] {
+    const extensionLanguageMap: Record<string, string> = {
+      '.ts': 'TypeScript',
+      '.tsx': 'TypeScript',
+      '.js': 'JavaScript',
+      '.jsx': 'JavaScript',
+      '.py': 'Python',
+      '.java': 'Java',
+      '.go': 'Go',
+      '.rs': 'Rust',
+      '.rb': 'Ruby',
+      '.php': 'PHP',
+      '.cs': 'C#',
+      '.cpp': 'C++',
+      '.c': 'C',
+    };
+
+    const languageCounts = new Map<string, number>();
+
+    for (const file of scanResult.files) {
+      if (file.type === 'source') {
+        const language = extensionLanguageMap[file.extension];
+        if (language) {
+          languageCounts.set(language, (languageCounts.get(language) || 0) + 1);
+        }
+      }
+    }
+
+    // Return languages sorted by usage
+    return Array.from(languageCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map((entry) => entry[0]);
+  }
+
+  /**
+   * Detect frameworks from key files
+   */
+  private async detectFrameworks(
+    _scanResult: ScanResult,
+    keyFiles: ScannedFile[]
+  ): Promise<string[]> {
+    const frameworks: Set<string> = new Set();
+
+    // Check for Node.js/npm
+    const hasPackageJson = keyFiles.some((f) => f.relativePath.endsWith('package.json'));
+    if (hasPackageJson) {
+      frameworks.add('Node.js');
+
+      // Try to read package.json for more details
+      const packageJsonFile = keyFiles.find((f) => f.relativePath.endsWith('package.json'));
+      if (packageJsonFile) {
+        const content = await this.scanner.readFile(packageJsonFile.path);
+        if (content) {
+          try {
+            const packageJson = JSON.parse(content) as { dependencies?: Record<string, string> };
+            const deps = packageJson.dependencies || {};
+
+            if (deps['react']) frameworks.add('React');
+            if (deps['vue']) frameworks.add('Vue');
+            if (deps['angular']) frameworks.add('Angular');
+            if (deps['express']) frameworks.add('Express');
+            if (deps['next']) frameworks.add('Next.js');
+            if (deps['nuxt']) frameworks.add('Nuxt.js');
+            if (deps['nestjs']) frameworks.add('NestJS');
+          } catch (error) {
+            this.logger.warn('Error parsing package.json', { error });
+          }
+        }
+      }
+    }
+
+    // Check for other ecosystems
+    if (keyFiles.some((f) => f.relativePath.endsWith('Cargo.toml'))) {
+      frameworks.add('Rust/Cargo');
+    }
+    if (keyFiles.some((f) => f.relativePath.endsWith('go.mod'))) {
+      frameworks.add('Go');
+    }
+    if (keyFiles.some((f) => f.relativePath.endsWith('requirements.txt'))) {
+      frameworks.add('Python');
+    }
+
+    return Array.from(frameworks);
+  }
+
+  /**
+   * Extract dependencies from key files
+   */
+  private async extractDependencies(keyFiles: ScannedFile[]): Promise<Record<string, string>> {
+    const dependencies: Record<string, string> = {};
+
+    const packageJsonFile = keyFiles.find((f) => f.relativePath.endsWith('package.json'));
+    if (packageJsonFile) {
+      const content = await this.scanner.readFile(packageJsonFile.path);
+      if (content) {
+        try {
+          const packageJson = JSON.parse(content) as { dependencies?: Record<string, string> };
+          Object.assign(dependencies, packageJson.dependencies || {});
+        } catch (error) {
+          this.logger.warn('Error parsing package.json dependencies', { error });
+        }
+      }
+    }
+
+    return dependencies;
+  }
+
+  /**
+   * Detect architectural patterns from file structure
+   */
+  private detectPatterns(scanResult: ScanResult): string[] {
+    const patterns: Set<string> = new Set();
+
+    const dirs = scanResult.directories.map((d) => d.toLowerCase());
+
+    // Check for common patterns
+    if (dirs.some((d) => d.includes('controller'))) patterns.add('MVC');
+    if (dirs.some((d) => d.includes('service'))) patterns.add('Service Layer');
+    if (dirs.some((d) => d.includes('repository'))) patterns.add('Repository Pattern');
+    if (dirs.some((d) => d.includes('component'))) patterns.add('Component-Based');
+    if (dirs.some((d) => d.includes('middleware'))) patterns.add('Middleware');
+    if (dirs.some((d) => d.includes('dto') || d.includes('model'))) patterns.add('DTO Pattern');
+
+    return Array.from(patterns);
+  }
+
+  /**
+   * Infer architecture style from scan result
+   */
+  private inferArchitecture(scanResult: ScanResult, patterns: string[]): string {
+    const dirs = scanResult.directories;
+
+    // Monorepo detection
+    if (dirs.some((d) => d.includes('packages') || d.includes('apps'))) {
+      return 'Monorepo';
+    }
+
+    // Microservices detection
+    if (dirs.some((d) => d.includes('services') || d.includes('microservices'))) {
+      return 'Microservices';
+    }
+
+    // Layered architecture
+    if (
+      patterns.includes('MVC') ||
+      patterns.includes('Service Layer') ||
+      patterns.includes('Repository Pattern')
+    ) {
+      return 'Layered Architecture';
+    }
+
+    // Component-based
+    if (patterns.includes('Component-Based')) {
+      return 'Component-Based';
+    }
+
+    return 'Standard Application';
   }
 
   /**
