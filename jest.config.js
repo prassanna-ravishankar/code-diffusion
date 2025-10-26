@@ -19,6 +19,7 @@ module.exports = {
     '^@services/(.*)$': '<rootDir>/src/services/$1',
     '^@types/(.*)$': '<rootDir>/src/types/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^dependency-cruiser$': '<rootDir>/tests/__mocks__/dependency-cruiser.ts',
   },
   globals: {
     'ts-jest': {
