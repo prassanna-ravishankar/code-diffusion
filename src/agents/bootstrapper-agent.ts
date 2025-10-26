@@ -7,6 +7,8 @@ import { BaseAgent, type BaseAgentConfig } from './base-agent';
 import Anthropic from '@anthropic-ai/sdk';
 import { NotionCRUDService } from '../services/notion-crud.service';
 import { CodebaseScanner, type ScanResult, type ScannedFile } from './codebase-scanner';
+import { ASTParser, type ASTAnalysisResult } from './ast-parser';
+import { DependencyAnalyzer, type DependencyAnalysisResult } from './dependency-analyzer';
 
 export interface BootstrapperConfig extends BaseAgentConfig {
   codebasePath?: string;
@@ -51,6 +53,8 @@ export class BootstrapperAgent extends BaseAgent {
   private notionService: NotionCRUDService;
   private bootstrapperConfig: BootstrapperConfig;
   private scanner: CodebaseScanner;
+  private astParser: ASTParser;
+  private dependencyAnalyzer: DependencyAnalyzer;
 
   constructor(config: BootstrapperConfig) {
     super(config);
@@ -74,6 +78,16 @@ export class BootstrapperAgent extends BaseAgent {
       maxDepth: config.maxAnalysisDepth || 10,
       respectGitignore: true,
       maxFileSize: 10 * 1024 * 1024, // 10MB
+    });
+
+    // Initialize AST parser
+    this.astParser = new ASTParser();
+
+    // Initialize dependency analyzer
+    this.dependencyAnalyzer = new DependencyAnalyzer({
+      includeNodeModules: false,
+      detectCircular: true,
+      maxDepth: config.maxAnalysisDepth || 10,
     });
 
     this.logger.info('BootstrapperAgent initialized', {
@@ -169,20 +183,41 @@ export class BootstrapperAgent extends BaseAgent {
       const frameworks = await this.detectFrameworks(scanResult, keyFiles);
       const dependencies = await this.extractDependencies(keyFiles);
 
+      // Perform AST analysis on source files
+      this.logger.info('Performing AST analysis');
+      const sourceFiles = scanResult.files.filter((f) => f.type === 'source');
+      const astResults = await this.astParser.parseFiles(
+        sourceFiles,
+        async (file) => await this.scanner.readFile(file.path)
+      );
+
+      // Extract code patterns from AST
+      const codePatterns = this.extractCodePatterns(astResults);
+
+      // Perform dependency analysis
+      this.logger.info('Performing dependency analysis');
+      const dependencyAnalysis = await this.dependencyAnalyzer.analyze(
+        this.bootstrapperConfig.codebasePath,
+        scanResult.files
+      );
+
       // Determine architecture patterns
       const patterns = this.detectPatterns(scanResult);
-      const architecture = this.inferArchitecture(scanResult, patterns);
+      const enhancedPatterns = this.enhancePatterns(patterns, codePatterns, dependencyAnalysis);
+      const architecture = this.inferArchitecture(scanResult, enhancedPatterns);
 
       this.logger.info('Codebase analysis complete', {
         totalFiles: scanResult.totalFiles,
         languages,
         frameworks,
+        astAnalyzedFiles: astResults.size,
+        circularDependencies: dependencyAnalysis?.circularDependencies.length || 0,
       });
 
       return {
         languages,
         frameworks,
-        patterns,
+        patterns: enhancedPatterns,
         keyFiles: keyFiles.map((f) => f.relativePath),
         dependencies,
         architecture,
@@ -191,6 +226,90 @@ export class BootstrapperAgent extends BaseAgent {
       this.logger.error('Error analyzing codebase', { error });
       return this.getPlaceholderContext();
     }
+  }
+
+  /**
+   * Extract code patterns from AST analysis results
+   */
+  private extractCodePatterns(astResults: Map<string, ASTAnalysisResult>): string[] {
+    const patterns: Set<string> = new Set();
+
+    for (const analysis of astResults.values()) {
+      if (!analysis) continue;
+
+      // Detect React patterns
+      if (analysis.hasJSX) {
+        patterns.add('React');
+        if (analysis.components.length > 0) {
+          patterns.add('React Components');
+        }
+        const hasHooks = analysis.components.some((c) => c.hooks.length > 0);
+        if (hasHooks) {
+          patterns.add('React Hooks');
+        }
+      }
+
+      // Detect TypeScript usage
+      if (analysis.hasTypeScript) {
+        patterns.add('TypeScript');
+      }
+
+      // Detect async patterns
+      const hasAsyncFunctions = analysis.functions.some((f) => f.isAsync);
+      if (hasAsyncFunctions) {
+        patterns.add('Async/Await');
+      }
+
+      // Detect class-based architecture
+      if (analysis.classes.length > 0) {
+        patterns.add('Class-Based');
+      }
+
+      // Detect functional programming
+      const hasFunctions = analysis.functions.length > analysis.classes.length;
+      if (hasFunctions && analysis.functions.length > 5) {
+        patterns.add('Functional Programming');
+      }
+    }
+
+    return Array.from(patterns);
+  }
+
+  /**
+   * Enhance patterns with AST and dependency analysis insights
+   */
+  private enhancePatterns(
+    basePatterns: string[],
+    codePatterns: string[],
+    dependencyAnalysis: DependencyAnalysisResult | null
+  ): string[] {
+    const enhanced = new Set([...basePatterns, ...codePatterns]);
+
+    if (dependencyAnalysis) {
+      // Detect modular architecture from dependency metrics
+      if (dependencyAnalysis.metrics.instabilityScore < 0.3) {
+        enhanced.add('Stable Core Architecture');
+      } else if (dependencyAnalysis.metrics.instabilityScore > 0.7) {
+        enhanced.add('Flexible Periphery');
+      }
+
+      // Detect circular dependency issues
+      if (dependencyAnalysis.circularDependencies.length > 0) {
+        enhanced.add('Circular Dependencies Detected');
+      }
+
+      // Detect well-modularized code
+      if (dependencyAnalysis.metrics.averageDependencies < 3) {
+        enhanced.add('Low Coupling');
+      }
+
+      // Detect orphan modules
+      if (dependencyAnalysis.orphanModules.length > 0) {
+        enhanced.add('Has Orphan Modules');
+      }
+    }
+
+    return Array.from(enhanced);
   }
 
   /**
