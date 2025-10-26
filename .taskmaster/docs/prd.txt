@@ -1,0 +1,804 @@
+<context>
+## Overview
+
+**Code Diffusion** is an autonomous multi-agent development system that transforms high-level feature requests into working code through progressive refinement. Inspired by diffusion models, it starts with an abstract idea and progressively "denoises" it through three stages: Bootstrapper (exploration), Planner (structuring), and Implementer (execution).
+
+**Problem it solves:** Complex feature development requires understanding existing codebases, making architectural decisions, and coordinating parallel work streams. Traditional approaches either automate too little (manual planning with AI assistance) or too much (single agent trying to do everything).
+
+**Who it's for:** Software engineers and teams working on LLMOps platforms, multi-repo systems, or complex features that require thoughtful decomposition and parallel execution.
+
+**Why it's valuable:** 
+- Separates concerns: exploration vs. planning vs. execution
+- Natural review points at each stage (gate your workflow at the right abstraction level)
+- Parallel execution where it matters (implementation) without premature optimization
+- Adaptive workflow design - simple fixes get simple flows, complex features get sophisticated multi-agent orchestration
+- Observable and debuggable through Notion as the coordination layer
+
+---
+
+## Core Features
+
+### 1. Progressive Refinement Architecture (Diffusion Model)
+
+**What it does:** Transforms feature requests through three progressive stages, each adding clarity and detail:
+- **Bootstrapper (high entropy):** Broad exploration, multiple approaches considered, outputs workflow design
+- **Planner (medium entropy):** Structured decomposition, decisions crystallized, detailed specifications per component
+- **Implementer (zero entropy):** Deterministic code generation in parallel worktrees
+
+**Why it's important:** Mirrors how developers actually think - you don't jump straight to implementation. You explore, design, then build. Each stage operates at the right level of abstraction with appropriate review gates.
+
+**How it works:**
+```
+Feature Request (noise)
+  ↓ denoise
+Bootstrapper Output (coarse structure)
+  - Codebase context, constraints, patterns
+  - Recommended approach
+  - Workflow specification (which agents, skills, worktrees needed)
+  ↓ denoise  
+Planner Output (clear structure)
+  - Detailed specs per component
+  - File-level changes planned
+  - Dependencies mapped
+  ↓ denoise
+Implementation (concrete code)
+  - Parallel execution in git worktrees
+  - Actual working code across repos
+```
+
+### 2. Notion-based Coordination
+
+**What it does:** Uses Notion as the single source of truth for all workflow state, agent tasks, and outputs. Every agent reads from and writes to Notion. Thin orchestration server reacts to Notion changes via webhooks.
+
+**Why it's important:** 
+- No custom state management needed
+- Built-in UI for review and control
+- Collaboration-ready (comments, edits, approvals)
+- Auditable workflow history
+- Simple to understand - just look at Notion
+
+**How it works:**
+```
+Notion Structure:
+├─ Workflows DB (feature requests)
+├─ Stage Pages DB (bootstrapper/planner/implementer outputs)
+└─ Subagent Tasks DB (parallel work items)
+
+Orchestration Server:
+├─ Listens to Notion webhooks
+├─ Spawns agents when status changes
+├─ Agents update Notion, triggering next steps
+└─ Stateless - all state lives in Notion
+```
+
+### 3. Dynamic Subagent Orchestration
+
+**What it does:** Stage agents dynamically spawn subagents as needed. Bootstrapper determines optimal agent topology for each feature. Planner and Implementer spawn subagents based on bootstrapper's specification.
+
+**Why it's important:** Not all features need the same agent structure. Simple bug fixes can be single-agent. Complex features get sophisticated multi-agent workflows automatically designed by the bootstrapper.
+
+**How it works:**
+- Bootstrapper analyzes request, decides: "This needs API design, DB schema, and frontend work"
+- Creates subagent task definitions in Notion
+- Orchestration server spawns each subagent with appropriate:
+  - Claude Skills (e.g., `fastapi/SKILL.md`, `react/SKILL.md`)
+  - MCPs (tools they need)
+  - Context (which repos, which worktrees)
+- Subagents work in parallel, write results to Notion
+- Parent agent synthesizes results
+
+### 4. Git Worktree Management
+
+**What it does:** Implementation stage agents work in isolated git worktrees for true parallelism. Bootstrapper and Planner just read from main branch (no worktrees needed).
+
+**Why it's important:** Multiple implementer subagents can modify code simultaneously without conflicts. Each works in isolated worktree, then changes can be reviewed/merged independently.
+
+**How it works:**
+```
+Bootstrapper specifies:
+{
+  implementer_config: {
+    subagents: [
+      { name: "backend", repos: ["api-service"], worktree: "impl-backend-feat-x" },
+      { name: "frontend", repos: ["web-app"], worktree: "impl-frontend-feat-x" }
+    ]
+  }
+}
+
+Orchestration server:
+1. Creates worktrees when implementation starts
+2. Spawns agents in their respective worktrees
+3. Agents make changes independently
+4. Results summarized in Notion with links to diffs/PRs
+```
+
+### 5. Multi-repo Support
+
+**What it does:** Agents can work across multiple repositories in the same workflow. Cross-repo dependencies are understood and coordinated.
+
+**Why it's important:** Real applications aren't single repos. Need to coordinate changes across backend, frontend, shared libraries, infrastructure, etc.
+
+**How it works:**
+- Bootstrapper identifies all repos touched by feature
+- Specifies which subagents work in which repos
+- Each repo gets its own worktree strategy for implementers
+- Cross-repo coordination via Notion (shared context visible to all agents)
+
+### 6. Skills-based Agent Configuration
+
+**What it does:** Leverages Claude Skills (SKILL.md files) to load best practices and domain expertise per agent. Bootstrapper specifies which skills each subagent should load.
+
+**Why it's important:** Agents need different expertise for different tasks. API design needs different knowledge than React component implementation. Skills provide reusable expertise.
+
+**How it works:**
+```
+Bootstrapper outputs:
+planner_config: {
+  subagents: [
+    {
+      name: "api_design",
+      skills: ["fastapi/SKILL.md", "your-api-patterns/SKILL.md"],
+      mcps: ["codebase_search", "pattern_analysis"]
+    }
+  ]
+}
+
+Orchestration server spawns agent with:
+claude-code \
+  --skill /mnt/skills/public/fastapi/SKILL.md \
+  --skill /mnt/skills/user/your-api-patterns/SKILL.md \
+  --mcp-config mcps.json \
+  --context "notion://task/${TASK_ID}"
+```
+
+---
+
+## User Experience
+
+### User Personas
+
+**Primary: Solo Developer / Tech Lead**
+- Building LLMOps platform or complex features
+- Comfortable with AI tools but wants more structure
+- Needs to review at right abstraction level (not drowning in code diffs)
+- Values observable, debuggable workflows
+
+**Secondary: Small Engineering Team**
+- Multiple people collaborating on features
+- Need shared visibility into AI-generated work
+- Want to approve/modify at different stages
+- Benefit from Notion's collaboration features
+
+### Key User Flows
+
+#### Flow 1: Simple Feature Request
+```
+User → Creates Notion page in Workflows DB
+      "Add email validation to user registration"
+
+↓ Bootstrapper runs automatically
+
+User → Reviews bootstrapper output in Notion
+      - Sees: simple change, single implementer needed
+      - Approves (sets status to "complete")
+
+↓ Planner skipped (bootstrapper determined unnecessary)
+
+↓ Implementer runs automatically
+
+User → Reviews implementation summary
+      - See code changes, run tests
+      - Approves or requests modifications
+```
+
+#### Flow 2: Complex Multi-repo Feature
+```
+User → Creates workflow
+      "Add OAuth2 authentication across all services"
+
+↓ Bootstrapper explores codebase
+
+User → Reviews bootstrapper findings
+      - Multiple approaches considered
+      - Recommends approach + agent topology
+      - Comments: "Use approach 2, but consider rate limiting"
+      - Edits bootstrapper output, approves
+
+↓ Planner spawns 4 subagents in parallel
+
+User → Reviews detailed plans in Notion
+      - API changes, DB schema, frontend flows, infra changes
+      - Each in separate Notion page
+      - Requests clarification on migration strategy
+      - Planner iterates, user approves
+
+↓ Implementer spawns 4 subagents in worktrees
+
+User → Monitors progress in real-time (Notion updates)
+      - Reviews implementation summaries
+      - Checks diffs/PRs linked from Notion
+      - Approves merge or requests changes
+```
+
+#### Flow 3: Forking (Pivoting Mid-workflow)
+```
+User → Reviews planner output
+      "Actually, I want a different approach"
+
+↓ User creates new workflow entry
+   References original, modifies request
+
+↓ New workflow starts from bootstrapper
+   Original workflow preserved for reference
+```
+
+### UI/UX Considerations
+
+**Primary Interface: Notion**
+- Rich text editing for outputs
+- Comments for feedback/questions
+- Status properties for workflow control
+- Database views for monitoring multiple workflows
+- Templates for consistency
+
+**Optional Custom UI (future):**
+- Real-time agent status dashboard
+- Workflow visualization (DAG view)
+- Quick action buttons (fork, retry, approve)
+- Side-by-side diff preview
+- Git worktree management UI
+
+**Review Gates:**
+- Bootstrapper → Planner: Review research findings and workflow design
+- Planner → Implementer: Review detailed specifications
+- Implementer → Done: Review code changes and test results
+
+---
+
+</context>
+<PRD>
+## Technical Architecture
+
+### System Components
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                         Notion                           │
+│  (Workflows DB, Stage Pages DB, Subagent Tasks DB)      │
+└────────────────┬────────────────────────────────────────┘
+                 │ webhooks
+                 ↓
+┌─────────────────────────────────────────────────────────┐
+│              Orchestration Server                        │
+│  - Webhook listener (Express/FastAPI)                   │
+│  - Agent spawner (Claude Code processes)                │
+│  - Git worktree manager                                 │
+│  - Stateless, reactive                                  │
+└────────────────┬────────────────────────────────────────┘
+                 │ spawns
+                 ↓
+┌─────────────────────────────────────────────────────────┐
+│                  Agent Processes                         │
+│  ┌─────────────┐  ┌──────────┐  ┌──────────────┐      │
+│  │ Bootstrapper│  │ Planner  │  │ Implementer  │      │
+│  └──────┬──────┘  └────┬─────┘  └──────┬───────┘      │
+│         │              │                │               │
+│    ┌────▼────┐    ┌───▼────┐      ┌───▼─────┐        │
+│    │Subagent │    │Subagent│      │Subagent │        │
+│    └─────────┘    └────────┘      └─────────┘        │
+└────────────────┬────────────────────────────────────────┘
+                 │ reads/writes
+                 ↓
+┌─────────────────────────────────────────────────────────┐
+│                  Code Repositories                       │
+│  - api-service/  (main + worktrees)                     │
+│  - web-app/      (main + worktrees)                     │
+│  - shared-lib/   (main + worktrees)                     │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│                    MCP Servers                           │
+│  - codebase-search                                      │
+│  - pattern-analysis                                     │
+│  - cross-repo-search                                    │
+│  - convention-discovery                                 │
+│  - (custom MCPs per use case)                           │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│                   Claude Skills                          │
+│  /mnt/skills/public/  (official skills)                 │
+│  /mnt/skills/user/    (custom team skills)              │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Data Models
+
+**Notion Workflows Database:**
+```typescript
+interface Workflow {
+  id: string;
+  title: string;
+  request: RichText;              // Original feature request
+  status: "pending" | "bootstrapping" | "planning" | "implementing" | "complete" | "blocked";
+  stage: "bootstrapper" | "planner" | "implementer";
+  repos: MultiSelect;             // Which repos involved
+  bootstrapper_page: Relation;    // Link to bootstrapper output
+  planner_page: Relation;         // Link to planner output
+  implementer_page: Relation;     // Link to implementer output
+  created: Date;
+  updated: Date;
+}
+```
+
+**Stage Pages Database:**
+```typescript
+interface StagePage {
+  id: string;
+  workflow: Relation;             // Parent workflow
+  stage: "bootstrapper" | "planner" | "implementer";
+  status: "in_progress" | "complete" | "needs_review";
+  content: RichText;              // Research findings, plans, summaries
+  workflow_spec?: JSON;           // Bootstrapper outputs this
+  subagent_tasks: Relation[];     // Links to subagent tasks
+}
+```
+
+**Subagent Tasks Database:**
+```typescript
+interface SubagentTask {
+  id: string;
+  parent_page: Relation;          // Which stage page
+  task_type: string;              // "api_design", "convention_discovery", etc
+  status: "pending" | "running" | "complete" | "failed";
+  repos: MultiSelect;
+  worktree?: string;              // Only for implementer tasks
+  skills: MultiSelect;            // Which SKILL.md files to load
+  mcps: MultiSelect;              // Which MCP servers to use
+  output: RichText;               // Results written here
+  git_refs?: JSON;                // Links to commits, branches, PRs
+}
+```
+
+**Workflow Specification (generated by Bootstrapper):**
+```typescript
+interface WorkflowSpec {
+  planner_config: {
+    subagents: Array<{
+      name: string;
+      task_type: string;
+      repos: string[];
+      skills: string[];           // Paths to SKILL.md files
+      mcps: string[];
+      prompt_context: string;
+    }>;
+  };
+  implementer_config: {
+    subagents: Array<{
+      name: string;
+      repos: string[];
+      worktree: string;           // Worktree name to create
+      skills: string[];
+      mcps: string[];
+      dependencies: string[];     // Other subagents to wait for
+    }>;
+  };
+}
+```
+
+### APIs and Integrations
+
+**Notion API:**
+- Webhooks for real-time updates
+- Database queries for reading workflow state
+- Page/block creation for agent outputs
+- Property updates for status management
+
+**Claude Code:**
+- CLI tool for agentic coding
+- Configured with Skills and MCPs per invocation
+- Context passed via notion:// protocol URLs
+- Spawned as subprocess by orchestration server
+
+**MCP (Model Context Protocol):**
+- Custom MCP servers for specialized capabilities
+- FastMCP for rapid development
+- Standard protocol, composable tools
+
+**Git:**
+- Worktree API for parallel development
+- Standard git operations via Claude Code
+- GitHub/GitLab API for PR creation (optional)
+
+### Infrastructure Requirements
+
+**Core:**
+- Orchestration server: Node.js/Python, single process, stateless
+- Notion workspace: databases configured per schema
+- Git repositories: standard repos with worktree support
+
+**Optional:**
+- Custom UI: React/Next.js frontend
+- Observability: OpenTelemetry (future phase)
+- Queue system: For scaling beyond single server (future)
+
+**Compute:**
+- Claude API access (Sonnet 4.5 recommended)
+- Server with git, Claude Code installed
+- Modest compute (orchestration is lightweight)
+
+---
+
+## Development Roadmap
+
+### Phase 1: Foundation & Single-Agent MVP
+**Scope:** Prove the core concept with minimal complexity
+
+**Build:**
+1. **Notion schema setup**
+   - Create Workflows DB, Stage Pages DB
+   - Basic properties and relations
+   - Templates for each stage
+
+2. **Orchestration server (minimal)**
+   - Webhook endpoint for Notion
+   - Single workflow: Bootstrapper → Implementer (skip Planner)
+   - Spawn Claude Code process with basic config
+   - No subagents yet, no worktrees
+
+3. **Bootstrapper agent**
+   - Takes feature request from Notion
+   - Explores codebase (single repo)
+   - Writes research findings back to Notion
+   - Updates status to trigger next stage
+
+4. **Simple Implementer agent**
+   - Reads bootstrapper output
+   - Makes code changes (single file)
+   - Writes summary to Notion
+
+**Goal:** End-to-end flow for simple features. Validate Notion coordination pattern.
+
+### Phase 2: Multi-Stage with Planning
+**Scope:** Add the Planner stage, prove three-stage diffusion
+
+**Build:**
+1. **Planner agent**
+   - Reads bootstrapper output
+   - Creates detailed specifications
+   - Updates Notion with structured plan
+
+2. **Enhanced Bootstrapper**
+   - Generate simple workflow specs
+   - Specify whether Planner is needed
+
+3. **Orchestration server updates**
+   - Handle three-stage flow
+   - Conditional stage execution based on workflow spec
+
+4. **Improved Implementer**
+   - Read from Planner output instead of Bootstrapper
+   - Follow detailed specifications
+
+**Goal:** Full three-stage pipeline working. Manual review gates functional.
+
+### Phase 3: Subagent Orchestration
+**Scope:** Dynamic subagent spawning, parallel work
+
+**Build:**
+1. **Subagent Tasks DB**
+   - Schema for task definitions
+   - Relations to stage pages
+
+2. **Stage agents spawn subagents**
+   - Bootstrapper/Planner create task entries in Notion
+   - Orchestration server spawns subagent processes
+   - Subagents write results to their task pages
+   - Parent agents synthesize results
+
+3. **Orchestration server enhancements**
+   - Listen for subagent task creation
+   - Spawn subagent processes with proper config
+   - Handle parallel execution
+
+4. **Example subagents**
+   - Convention discovery
+   - Architecture analysis
+   - API design
+   - Frontend spec
+
+**Goal:** Prove parallel agent coordination through Notion. Complex features decompose naturally.
+
+### Phase 4: Git Worktrees & Multi-repo
+**Scope:** True parallel implementation, multi-repo support
+
+**Build:**
+1. **Git worktree management**
+   - Orchestration server creates/destroys worktrees
+   - Worktree naming convention
+   - Cleanup after completion
+
+2. **Multi-repo configuration**
+   - Workflow spec includes repo list
+   - Agents can work across repos
+   - Cross-repo context sharing
+
+3. **Parallel implementation**
+   - Multiple implementer subagents in separate worktrees
+   - Each produces independent changes
+   - Summary with links to all changes
+
+4. **Bootstrapper worktree design**
+   - Analyzes which repos need changes
+   - Specifies worktree topology in workflow spec
+
+**Goal:** Complex multi-repo features work seamlessly. Parallel implementation proves valuable.
+
+### Phase 5: Skills Integration
+**Scope:** Load domain expertise dynamically per agent
+
+**Build:**
+1. **Skills configuration**
+   - Map task types to skill files
+   - Bootstrapper specifies skills in workflow spec
+
+2. **Orchestration server updates**
+   - Pass skill files to Claude Code invocations
+   - Support custom user skills
+
+3. **Skill library**
+   - Team conventions skill
+   - Language-specific skills (Python, TypeScript, etc.)
+   - Architecture pattern skills
+
+4. **Skill discovery subagent**
+   - Bootstrapper can spawn skill discovery
+   - Generates custom SKILL.md from codebase analysis
+
+**Goal:** Agents have appropriate expertise for their tasks. Quality improves with skills.
+
+### Phase 6: Polish & Observability
+**Scope:** Production-ready, debuggable, observable
+
+**Build:**
+1. **Error handling**
+   - Agent failures captured in Notion
+   - Retry mechanisms
+   - Clear error messages
+
+2. **Monitoring**
+   - Agent status dashboard (in Notion or custom UI)
+   - Token usage tracking
+   - Performance metrics
+
+3. **Workflow templates**
+   - Common patterns pre-configured
+   - Quick start guides
+
+4. **Documentation**
+   - Setup guide
+   - How to write good feature requests
+   - How to review at each stage
+   - How to create custom skills/MCPs
+
+**Goal:** Reliable, observable, ready for daily use.
+
+### Phase 7: Advanced Features (Future)
+**Scope:** Nice-to-haves, optimization
+
+- Custom web UI (workflow visualization, quick actions)
+- OpenTelemetry instrumentation
+- Durable execution (DBOS integration)
+- Advanced retry/resume logic
+- Workflow forking/branching UI
+- Team collaboration features
+- Cost optimization
+- Scale beyond single server
+
+---
+
+## Logical Dependency Chain
+
+### Foundation First
+1. **Notion + Orchestration Server + Single Agent**
+   - Must prove the coordination pattern works
+   - Simplest possible: request → agent → response
+   - No stages, no subagents
+
+### Quick Win: Visible Progress
+2. **Three-Stage Pipeline (no subagents)**
+   - Bootstrapper → Planner → Implementer
+   - Each writes to Notion
+   - User can see progressive refinement
+   - Still simple enough to debug easily
+
+### Complexity Layer
+3. **Subagent Spawning**
+   - Now that stages work, add parallel decomposition
+   - Start with Planner subagents (easier than implementer)
+   - No worktrees yet (subagents write to Notion, not code)
+
+### Parallel Execution
+4. **Git Worktrees + Multi-repo**
+   - Once subagents work, add worktrees to implementers
+   - Prove true parallel code modification
+   - Multi-repo coordination builds on this
+
+### Quality Improvements
+5. **Skills System**
+   - Add after core workflow is proven
+   - Improves output quality without changing architecture
+   - Can be added incrementally
+
+6. **Polish & Observability**
+   - After everything works, make it production-ready
+   - Error handling, monitoring, docs
+
+### Each phase is:
+- **Atomic:** Can be built and tested independently
+- **Valuable:** Adds clear user benefit
+- **Buildable upon:** Next phase extends, doesn't replace
+- **Demo-able:** Can show progress to stakeholders
+
+---
+
+## Risks and Mitigations
+
+### Technical Challenges
+
+**Risk: Notion API rate limits**
+- *Mitigation:* Batch updates where possible. Cache reads. Monitor usage. Have fallback to polling if webhooks throttled.
+
+**Risk: Agent coordination failures (race conditions)**
+- *Mitigation:* Use Notion properties as locks. Clear state machine per workflow. Idempotent operations where possible.
+
+**Risk: Git worktree complexity (conflicts, cleanup)**
+- *Mitigation:* Strong naming conventions. Automated cleanup. Start with simple cases. Add merge conflict detection.
+
+**Risk: Subagent outputs don't synthesize well**
+- *Mitigation:* Clear output schemas per subagent type. Parent agent responsible for synthesis. Iterate on prompts.
+
+**Risk: Token costs escalate with many agents**
+- *Mitigation:* Start simple. Monitor costs. Optimize prompts. Consider caching. Phase 7 includes cost optimization.
+
+**Risk: Claude Code stability/changes**
+- *Mitigation:* Pin versions. Abstract behind orchestration layer. Monitor Claude Code updates.
+
+### MVP Scoping
+
+**Risk: Trying to build everything at once**
+- *Mitigation:* Strict phase boundaries. Phase 1 is intentionally minimal. Each phase adds ONE major capability.
+
+**Risk: Over-engineering the orchestration server**
+- *Mitigation:* Keep it stateless. All logic in agents or Notion. Server is just a spawner.
+
+**Risk: Notion becoming too complex**
+- *Mitigation:* Start with simple schema. Add properties only when needed. Use relations sparingly.
+
+### Resource Constraints
+
+**Risk: Claude API costs during development**
+- *Mitigation:* Use smaller contexts. Shorter iterations. Cache aggressively. Monitor spending.
+
+**Risk: Time to build custom MCPs**
+- *Mitigation:* Start with existing MCPs. Build custom ones only when needed. FastMCP makes this quick.
+
+**Risk: Maintaining multiple repos for testing**
+- *Mitigation:* Use toy repos for early phases. Add real repos incrementally.
+
+---
+
+## Appendix
+
+### Research Findings
+
+**Similar Systems:**
+- GitHub Copilot Workspace: Single-agent approach, less structure
+- Devin: Opaque system, no review gates
+- Cursor Agent: IDE-focused, less workflow orchestration
+- AutoGPT: Too autonomous, brittle for real work
+
+**Key Insights:**
+- Review gates at the right abstraction level are critical
+- Notion as coordination beats custom state management
+- Git worktrees underutilized for agent parallelism
+- Skills system (October 2025) enables expertise loading
+
+### Technical Specifications
+
+**Orchestration Server:**
+```typescript
+// Webhook handler
+app.post('/notion-webhook', async (req, res) => {
+  const { type, item_id, database_id } = req.body;
+  
+  if (database_id === WORKFLOWS_DB && statusChanged(item_id, 'complete')) {
+    const workflow = await notion.getPage(item_id);
+    spawnNextStageAgent(workflow);
+  }
+  
+  if (database_id === SUBAGENT_TASKS_DB && type === 'created') {
+    const task = await notion.getPage(item_id);
+    spawnSubagent(task);
+  }
+  
+  res.sendStatus(200);
+});
+
+function spawnAgent(config: AgentConfig) {
+  const skills = config.skills.map(s => `--skill ${s}`).join(' ');
+  const mcps = `--mcp-config ${config.mcpConfigFile}`;
+  const context = `--context "notion://${config.notionPageId}"`;
+  
+  exec(`claude-code ${skills} ${mcps} ${context} --prompt "${config.prompt}"`);
+}
+```
+
+**Workflow Spec Format:**
+```json
+{
+  "planner_config": {
+    "subagents": [
+      {
+        "name": "api_design",
+        "task_type": "design_api",
+        "repos": ["api-service"],
+        "skills": [
+          "/mnt/skills/public/fastapi/SKILL.md",
+          "/mnt/skills/user/team-api-patterns/SKILL.md"
+        ],
+        "mcps": ["codebase_search", "pattern_analysis"],
+        "prompt_context": "Design OAuth2 authentication API following RESTful principles"
+      }
+    ]
+  },
+  "implementer_config": {
+    "subagents": [
+      {
+        "name": "backend_implementation",
+        "repos": ["api-service"],
+        "worktree": "impl-oauth-backend",
+        "skills": ["/mnt/skills/public/python/SKILL.md"],
+        "mcps": ["file_operations"],
+        "dependencies": []
+      }
+    ]
+  }
+}
+```
+
+### Diffusion Metaphor Deep Dive
+
+The core insight is treating software development like a diffusion process:
+
+**Traditional Diffusion Models:**
+```
+Noise → [Denoise] → [Denoise] → [Denoise] → Image
+(high entropy)              (progressively lower)        (zero entropy)
+```
+
+**Code Diffusion:**
+```
+Feature Idea → [Bootstrap] → [Plan] → [Implement] → Working Code
+(ambiguous)    (structured)   (detailed)  (concrete)   (deterministic)
+
+Each stage:
+- Reduces uncertainty
+- Adds information
+- Makes commitments
+- Operates at appropriate abstraction level
+```
+
+**Why this works:**
+1. **Natural review gates:** You review at the abstraction level that matches the uncertainty
+2. **Progressive commitment:** Early stages keep options open, later stages lock in decisions
+3. **Appropriate compute allocation:** More exploration early, less later
+4. **Emergent structure:** Complex workflows emerge from simple rules
+
+**Temperature analogy:**
+- Bootstrapper: High temperature (explore widely)
+- Planner: Medium temperature (converge on design)
+- Implementer: Low temperature (deterministic execution)
+
+This isn't just metaphor - it's how you configure the agents and prompt them. The diffusion framing guides the entire system design.
+</PRD>

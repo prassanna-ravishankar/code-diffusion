@@ -1,0 +1,1623 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Set up project foundation and development environment",
+        "description": "Initialize the Code Diffusion project with proper TypeScript configuration, development tools, and project structure",
+        "details": "Create a new Node.js project with TypeScript, ESLint, Prettier, and Jest. Set up package.json with latest dependencies: @notionhq/client ^2.2.15, express ^4.18.2, @types/express ^4.17.21, typescript ^5.3.3, fastify ^4.24.3 as alternative to Express. Configure tsconfig.json with strict mode and ES2022 target. Set up development scripts for build, test, dev mode with nodemon. Create project structure: src/, tests/, config/, docs/. Initialize git repository with proper .gitignore for Node.js, environment files, and IDE configs.",
+        "testStrategy": "Verify TypeScript compilation works, ESLint and Prettier run without errors, Jest test runner is functional with a basic test case, and development server starts correctly",
+        "priority": "high",
+        "dependencies": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize package.json with dependencies",
+            "description": "Create package.json file and install all required dependencies for the Code Diffusion project",
+            "dependencies": [],
+            "details": "Run npm init to create package.json, then install dependencies: @notionhq/client ^2.2.15, express ^4.18.2, @types/express ^4.17.21, typescript ^5.3.3, fastify ^4.24.3, nodemon, jest, @types/jest, @types/node. Configure package.json scripts for build, test, dev, and start commands. Set up proper package metadata including name, version, description, and author.",
+            "status": "done",
+            "testStrategy": "Verify all dependencies install correctly, npm scripts execute without errors, and package.json has proper structure"
+          },
+          {
+            "id": 2,
+            "title": "Configure TypeScript compilation settings",
+            "description": "Set up tsconfig.json with strict mode and ES2022 target for optimal TypeScript development",
+            "dependencies": [
+              1
+            ],
+            "details": "Create tsconfig.json with strict: true, target: ES2022, module: commonjs, outDir: dist, rootDir: src, declaration: true, sourceMap: true. Configure path mapping for clean imports, enable decorators if needed, and set up proper type checking options. Include exclude patterns for node_modules, dist, and test files.",
+            "status": "done",
+            "testStrategy": "Verify TypeScript compilation works correctly, type checking is strict, and generated JavaScript follows ES2022 standards"
+          },
+          {
+            "id": 3,
+            "title": "Set up development tooling (ESLint, Prettier, Jest)",
+            "description": "Configure code quality and testing tools for consistent development workflow",
+            "dependencies": [
+              2
+            ],
+            "details": "Install and configure ESLint with TypeScript parser and recommended rules. Set up Prettier with consistent formatting rules. Configure Jest for TypeScript testing with ts-jest preset. Create .eslintrc.js, .prettierrc, and jest.config.js files. Add pre-commit hooks with husky and lint-staged for automated code quality checks. Include VS Code settings for consistent editor configuration.",
+            "status": "done",
+            "testStrategy": "Run ESLint and Prettier without errors, execute Jest with a basic test case, and verify pre-commit hooks work correctly"
+          },
+          {
+            "id": 4,
+            "title": "Create project directory structure",
+            "description": "Establish organized folder structure for source code, tests, configuration, and documentation",
+            "dependencies": [
+              3
+            ],
+            "details": "Create directory structure: src/ (main source code), src/types/ (TypeScript interfaces), src/services/ (business logic), src/utils/ (helper functions), tests/ (test files), config/ (configuration files), docs/ (project documentation), dist/ (compiled output). Add index.ts files where appropriate and create basic README.md with project overview.",
+            "status": "done",
+            "testStrategy": "Verify all directories are created correctly, index.ts files compile, and basic project structure follows Node.js conventions"
+          },
+          {
+            "id": 5,
+            "title": "Initialize git repository with proper .gitignore",
+            "description": "Set up version control with appropriate ignore patterns for Node.js TypeScript project",
+            "dependencies": [
+              4
+            ],
+            "details": "Initialize git repository with git init. Create comprehensive .gitignore including: node_modules/, dist/, coverage/, .env files, IDE-specific files (.vscode/, .idea/), OS-specific files (.DS_Store, Thumbs.db), log files (*.log), and temporary files. Make initial commit with project foundation. Set up branch protection and commit message conventions if needed.",
+            "status": "in-progress",
+            "testStrategy": "Verify git repository is initialized, .gitignore properly excludes specified files, and initial commit includes all necessary project files"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Design and implement Notion database schemas",
+        "description": "Create the core Notion databases (Workflows, Stage Pages, Subagent Tasks) with proper properties, relations, and templates",
+        "details": "Using Notion's latest API v2022-06-28, create three core databases: 1) Workflows DB with properties: title (title), request (rich_text), status (select: pending/bootstrapping/planning/implementing/complete/blocked), stage (select), repos (multi_select), created/updated (date), relations to stage pages. 2) Stage Pages DB with workflow relation, stage type, status, content (rich_text), workflow_spec (rich_text formatted as JSON), subagent_tasks relation. 3) Subagent Tasks DB with parent_page relation, task_type (text), status (select), repos (multi_select), worktree (text), skills (multi_select), mcps (multi_select), output (rich_text), git_refs (rich_text JSON). Create database templates for each stage type with proper formatting and placeholders.",
+        "testStrategy": "Verify all databases are created with correct schema, relations work bidirectionally, templates populate correctly, and test data can be inserted and queried via Notion API",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and create Workflows database schema",
+            "description": "Create the primary Workflows database in Notion with all required properties including title, request, status, stage, repos, timestamps, and relations to stage pages",
+            "dependencies": [],
+            "details": "Using Notion API v2022-06-28, create Workflows database with properties: title (title type), request (rich_text), status (select with options: pending/bootstrapping/planning/implementing/complete/blocked), stage (select), repos (multi_select), created_date and updated_date (date properties), and establish relation property to Stage Pages database. Configure proper property types and validation rules.",
+            "status": "pending",
+            "testStrategy": "Verify database creation via API, test all property types are correct, validate select options are properly configured, and confirm relation setup works"
+          },
+          {
+            "id": 2,
+            "title": "Implement Stage Pages database with workflow relations",
+            "description": "Create Stage Pages database with bidirectional relation to Workflows and properties for stage management including content and workflow specifications",
+            "dependencies": [
+              1
+            ],
+            "details": "Create Stage Pages database with properties: workflow relation (linking back to Workflows DB), stage_type (select), status (select), content (rich_text), workflow_spec (rich_text formatted as JSON), and subagent_tasks relation. Ensure bidirectional relations work properly between Workflows and Stage Pages databases. Configure proper permissions and access controls.",
+            "status": "pending",
+            "testStrategy": "Test bidirectional relations between Workflows and Stage Pages, verify JSON storage in workflow_spec property, and validate all property types function correctly"
+          },
+          {
+            "id": 3,
+            "title": "Build Subagent Tasks database implementation",
+            "description": "Create the Subagent Tasks database with relations to Stage Pages and all task management properties including repositories, worktrees, and execution details",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement Subagent Tasks database with properties: parent_page relation (to Stage Pages), task_type (text), status (select), repos (multi_select), worktree (text), skills (multi_select), mcps (multi_select), output (rich_text), git_refs (rich_text formatted as JSON). Configure proper relation hierarchies and ensure data integrity across all three databases.",
+            "status": "pending",
+            "testStrategy": "Verify relations to Stage Pages work correctly, test JSON storage in git_refs property, validate multi-select properties function properly, and confirm data flows correctly through the database hierarchy"
+          },
+          {
+            "id": 4,
+            "title": "Create database templates and validation setup",
+            "description": "Design and implement database templates for each stage type with proper formatting, placeholders, and validation rules to ensure data consistency",
+            "dependencies": [
+              3
+            ],
+            "details": "Create database templates for bootstrapping, planning, and implementing stages with pre-filled placeholders and proper formatting. Implement validation logic to ensure data consistency across all three databases. Create helper functions for template instantiation and validation checks. Add documentation for proper database usage and template guidelines.",
+            "status": "pending",
+            "testStrategy": "Test template creation and instantiation for each stage type, verify validation rules prevent invalid data entry, confirm templates populate with correct placeholders, and validate end-to-end database workflow"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Implement Notion API integration layer",
+        "description": "Build a TypeScript service layer for interacting with Notion databases, handling CRUD operations and webhook management",
+        "details": "Create NotionService class using @notionhq/client SDK with methods for: createWorkflow(), updateWorkflowStatus(), getWorkflow(), createStagePage(), updateStagePage(), createSubagentTask(), updateSubagentTask(). Implement proper error handling with exponential backoff for rate limits. Add TypeScript interfaces matching the database schemas from task 2. Include methods for querying databases with filters and pagination. Implement webhook signature verification using crypto module. Add logging with winston ^3.11.0 for debugging API calls. Create environment configuration for Notion API key and database IDs.",
+        "testStrategy": "Unit tests for all CRUD operations, integration tests with actual Notion databases, rate limit handling verification, webhook signature validation tests, and error scenario testing",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create NotionService class foundation with SDK setup",
+            "description": "Set up the base NotionService class structure with proper initialization and configuration management for the Notion API client",
+            "dependencies": [],
+            "details": "Create NotionService class with constructor that initializes @notionhq/client SDK. Add environment configuration loading for NOTION_API_KEY and database IDs. Implement basic class structure with private client instance and configuration validation. Set up TypeScript class with proper exports and imports.",
+            "status": "pending",
+            "testStrategy": "Unit tests for class instantiation, configuration validation, and SDK initialization"
+          },
+          {
+            "id": 2,
+            "title": "Implement core CRUD operations for workflows and stages",
+            "description": "Build the primary CRUD methods for workflow and stage management including createWorkflow, updateWorkflowStatus, getWorkflow, createStagePage, and updateStagePage",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement createWorkflow() method to create new workflow entries in Notion database. Add updateWorkflowStatus() for status updates with proper validation. Create getWorkflow() with filtering and pagination support. Implement createStagePage() and updateStagePage() for stage management. Add proper parameter validation and return type definitions.",
+            "status": "pending",
+            "testStrategy": "Unit tests for each CRUD operation, integration tests with mock Notion responses, and validation of data transformations"
+          },
+          {
+            "id": 3,
+            "title": "Add subagent task CRUD operations",
+            "description": "Implement createSubagentTask and updateSubagentTask methods for managing subagent task entries in the Notion database",
+            "dependencies": [
+              2
+            ],
+            "details": "Create createSubagentTask() method to add new subagent tasks with proper parent task relationships. Implement updateSubagentTask() for task status updates and progress tracking. Add query methods for retrieving subagent tasks with filtering by parent workflow/stage. Include batch operations for handling multiple subagent tasks efficiently.",
+            "status": "pending",
+            "testStrategy": "Unit tests for subagent task operations, relationship validation tests, and batch operation performance testing"
+          },
+          {
+            "id": 4,
+            "title": "Implement error handling and rate limiting with exponential backoff",
+            "description": "Add comprehensive error handling, retry logic with exponential backoff, and rate limit management for all Notion API interactions",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement exponential backoff strategy using async/await with configurable retry attempts and delay intervals. Add specific error handling for rate limits (HTTP 429), network errors, and API validation errors. Create retry wrapper function that can be applied to all API calls. Add circuit breaker pattern for API health management. Include proper error logging and metrics collection.",
+            "status": "pending",
+            "testStrategy": "Test rate limit scenarios, verify exponential backoff timing, error recovery validation, and circuit breaker functionality"
+          },
+          {
+            "id": 5,
+            "title": "Create TypeScript interfaces and types for Notion database schemas",
+            "description": "Define comprehensive TypeScript interfaces matching the Notion database schemas from task 2, including proper type definitions for all data structures",
+            "dependencies": [
+              1
+            ],
+            "details": "Create interfaces for WorkflowRecord, StageRecord, SubagentTaskRecord matching Notion database properties. Add type definitions for API request/response objects, filter parameters, and pagination options. Implement proper union types for status enums and validation schemas. Add utility types for partial updates and query builders. Include JSDoc documentation for all interfaces.",
+            "status": "pending",
+            "testStrategy": "Type checking validation, interface compatibility tests with actual Notion responses, and schema validation testing"
+          },
+          {
+            "id": 6,
+            "title": "Implement webhook signature verification and logging configuration",
+            "description": "Add webhook signature verification using crypto module and set up comprehensive logging with winston for debugging and monitoring",
+            "dependencies": [
+              4,
+              5
+            ],
+            "details": "Implement webhook signature verification using crypto.createHmac() to validate incoming webhook requests from Notion. Add middleware function for Express.js integration. Set up winston logger with structured JSON formatting, multiple log levels, and file rotation. Add API call logging with request/response details, timing metrics, and error tracking. Include configuration for log levels and output destinations.",
+            "status": "pending",
+            "testStrategy": "Webhook signature validation tests with valid/invalid signatures, logging output verification, and log rotation testing"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Build orchestration server with webhook handling",
+        "description": "Create the core orchestration server that listens to Notion webhooks and coordinates agent spawning",
+        "details": "Build Express.js server with TypeScript using express ^4.18.2. Implement POST /notion-webhook endpoint with proper request validation and signature verification. Create WebhookHandler class that processes different event types: workflow status changes, subagent task creation, stage page updates. Implement agent spawning logic using Node.js child_process.spawn() with proper stdio handling and process lifecycle management. Add middleware for request logging, error handling, and CORS. Configure environment variables for server port, Notion webhook secret, and agent configuration paths. Use helmet ^7.1.0 for security headers and express-rate-limit ^7.1.5 for webhook rate limiting.",
+        "testStrategy": "Integration tests with mock Notion webhooks, agent spawning verification, webhook signature validation, error handling for malformed requests, and load testing for concurrent webhook processing",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Express.js server foundation with TypeScript",
+            "description": "Initialize the basic Express.js server structure with TypeScript configuration and essential middleware setup",
+            "dependencies": [],
+            "details": "Create Express.js server using TypeScript with express ^4.18.2. Set up basic server structure with proper TypeScript configuration, error handling middleware, CORS setup, and request logging. Configure development and production environments with appropriate settings.",
+            "status": "pending",
+            "testStrategy": "Unit tests for server initialization, middleware configuration validation, and basic endpoint responsiveness"
+          },
+          {
+            "id": 2,
+            "title": "Implement webhook endpoint structure",
+            "description": "Create the POST /notion-webhook endpoint with proper routing and basic request handling",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement POST /notion-webhook endpoint with proper Express routing. Add request body parsing, basic validation for webhook payload structure, and initial response handling. Set up endpoint-specific middleware and error boundaries.",
+            "status": "pending",
+            "testStrategy": "Integration tests for endpoint accessibility, request parsing, and proper HTTP response codes"
+          },
+          {
+            "id": 3,
+            "title": "Build webhook signature validation system",
+            "description": "Implement secure webhook signature verification to authenticate requests from Notion",
+            "dependencies": [
+              2
+            ],
+            "details": "Create signature validation middleware using Notion webhook secret. Implement HMAC-SHA256 verification for incoming webhook requests. Add proper error handling for invalid signatures and security logging for failed authentication attempts.",
+            "status": "pending",
+            "testStrategy": "Security tests with valid and invalid signatures, performance tests for validation overhead, and integration tests with mock Notion webhooks"
+          },
+          {
+            "id": 4,
+            "title": "Develop WebhookHandler class for event processing",
+            "description": "Create a comprehensive webhook handler that processes different Notion event types",
+            "dependencies": [
+              3
+            ],
+            "details": "Build WebhookHandler class that processes workflow status changes, subagent task creation, and stage page updates. Implement event type detection, payload parsing, and appropriate response generation for each event type. Add event logging and metrics collection.",
+            "status": "pending",
+            "testStrategy": "Unit tests for each event type processing, integration tests with various webhook payloads, and error handling validation"
+          },
+          {
+            "id": 5,
+            "title": "Implement agent spawning logic with process management",
+            "description": "Build the core agent spawning system using Node.js child processes with proper lifecycle management",
+            "dependencies": [
+              4
+            ],
+            "details": "Implement agent spawning using Node.js child_process.spawn() with proper stdio handling, process lifecycle management, and cleanup. Add process monitoring, timeout handling, and graceful shutdown capabilities. Implement process pool management for concurrent agent execution.",
+            "status": "pending",
+            "testStrategy": "Process spawning tests, lifecycle management validation, concurrent execution testing, and resource cleanup verification"
+          },
+          {
+            "id": 6,
+            "title": "Configure security and rate limiting",
+            "description": "Implement comprehensive security measures and rate limiting for webhook endpoints",
+            "dependencies": [
+              2
+            ],
+            "details": "Add helmet ^7.1.0 for security headers and express-rate-limit ^7.1.5 for webhook rate limiting. Configure appropriate rate limits for webhook endpoints, implement IP-based restrictions if needed, and add security monitoring and alerting.",
+            "status": "pending",
+            "testStrategy": "Security testing for header configuration, rate limiting validation under load, and penetration testing for common vulnerabilities"
+          },
+          {
+            "id": 7,
+            "title": "Set up environment configuration and server deployment",
+            "description": "Configure environment variables and prepare the server for deployment with proper configuration management",
+            "dependencies": [
+              1,
+              5,
+              6
+            ],
+            "details": "Configure environment variables for server port, Notion webhook secret, and agent configuration paths. Set up configuration validation, environment-specific settings, and deployment preparation. Add health check endpoints and monitoring configuration.",
+            "status": "pending",
+            "testStrategy": "Configuration validation tests, environment variable handling, health check functionality, and deployment verification"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Implement Bootstrapper agent core functionality",
+        "description": "Create the Bootstrapper agent that analyzes feature requests and explores codebases to generate initial workflow specifications",
+        "details": "Build BootstrapperAgent class that reads feature requests from Notion, analyzes codebase context using file system scanning and AST parsing with @babel/parser ^7.23.6 for JavaScript/TypeScript. Implement codebase exploration logic: identify relevant files, extract patterns, analyze dependencies with dependency-cruiser ^15.6.0. Create workflow specification generator that outputs JSON matching the WorkflowSpec interface from the PRD. Integrate with Claude API using @anthropic-ai/sdk ^0.15.1 for intelligent analysis. Add support for multiple programming languages and frameworks detection. Implement repository structure analysis and convention discovery. Output structured findings to Notion Stage Pages with rich formatting.",
+        "testStrategy": "Test with various codebase types (React, Node.js, Python), verify workflow spec generation accuracy, validate codebase analysis completeness, and integration test with actual repositories",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create BootstrapperAgent class foundation",
+            "description": "Set up the basic BootstrapperAgent class structure with core initialization, configuration management, and logging setup",
+            "dependencies": [],
+            "details": "Create BootstrapperAgent class that extends base Agent class if available. Implement constructor with configuration options for Notion API keys, Claude API keys, and codebase paths. Add basic logging setup using structured JSON format. Include error handling foundation and initialization validation. Set up TypeScript interfaces for configuration and internal state management.",
+            "status": "pending",
+            "testStrategy": "Unit tests for class instantiation, configuration validation, and logging functionality"
+          },
+          {
+            "id": 2,
+            "title": "Implement codebase scanning and file analysis",
+            "description": "Build file system scanning capabilities to discover and categorize files within target codebases",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement file system traversal using Node.js fs module to scan repository directories. Add file type detection and categorization (source files, config files, documentation). Include gitignore parsing to respect repository exclusion rules. Implement file content reading with encoding detection and size limits for safety. Add caching mechanism for repeated scans of large repositories.",
+            "status": "pending",
+            "testStrategy": "Test with various repository structures, verify gitignore handling, and validate file categorization accuracy"
+          },
+          {
+            "id": 3,
+            "title": "Integrate AST parsing with @babel/parser",
+            "description": "Implement Abstract Syntax Tree parsing for JavaScript and TypeScript files to extract code structure and patterns",
+            "dependencies": [
+              2
+            ],
+            "details": "Integrate @babel/parser ^7.23.6 for JavaScript/TypeScript AST generation. Implement parser configuration for different language variants (JSX, TypeScript, ES modules). Add AST traversal logic to extract imports, exports, function definitions, class structures, and component patterns. Include error handling for malformed code files. Implement pattern extraction for framework detection (React, Vue, Angular).",
+            "status": "pending",
+            "testStrategy": "Test parsing of various JS/TS codebases, verify pattern extraction accuracy, and validate error handling for invalid syntax"
+          },
+          {
+            "id": 4,
+            "title": "Implement dependency analysis with dependency-cruiser",
+            "description": "Add comprehensive dependency analysis using dependency-cruiser to map code relationships and architecture",
+            "dependencies": [
+              3
+            ],
+            "details": "Integrate dependency-cruiser ^15.6.0 for dependency graph generation. Configure cruiser options for different project types and module systems. Implement dependency graph analysis to identify key modules, circular dependencies, and architectural patterns. Add dependency metrics calculation for complexity assessment. Include external dependency analysis from package.json and similar files.",
+            "status": "pending",
+            "testStrategy": "Validate dependency graphs against known codebases, test circular dependency detection, and verify architectural pattern recognition"
+          },
+          {
+            "id": 5,
+            "title": "Integrate Claude API for intelligent analysis",
+            "description": "Connect with Claude API using Anthropic SDK to provide AI-powered codebase analysis and insights",
+            "dependencies": [
+              4
+            ],
+            "details": "Integrate @anthropic-ai/sdk ^0.15.1 for Claude API communication. Implement prompt engineering for codebase analysis tasks including pattern recognition, architecture assessment, and framework detection. Add context management for large codebases with token limit awareness. Implement caching for repeated analysis requests. Include rate limiting and error handling for API calls.",
+            "status": "pending",
+            "testStrategy": "Test API integration with various prompt types, validate response parsing, and verify rate limiting behavior"
+          },
+          {
+            "id": 6,
+            "title": "Build workflow specification generator",
+            "description": "Create the core logic to generate structured workflow specifications matching the WorkflowSpec interface",
+            "dependencies": [
+              5
+            ],
+            "details": "Implement WorkflowSpecGenerator that combines AST analysis, dependency insights, and Claude AI recommendations to create workflow specifications. Build JSON output formatting that matches the WorkflowSpec interface from the PRD. Add validation logic for generated specifications. Implement template system for common workflow patterns. Include configuration options for workflow complexity and scope.",
+            "status": "pending",
+            "testStrategy": "Validate generated workflow specs against interface schema, test with various codebase types, and verify specification completeness"
+          },
+          {
+            "id": 7,
+            "title": "Implement repository pattern detection",
+            "description": "Add intelligent detection of repository patterns, conventions, and architectural styles across multiple programming languages",
+            "dependencies": [
+              6
+            ],
+            "details": "Implement pattern detection algorithms for common frameworks (React, Angular, Vue, Express, Django, etc.). Add convention analysis for code organization, naming patterns, and project structure. Include language-specific pattern recognition beyond JavaScript/TypeScript. Implement confidence scoring for detected patterns. Add extensible plugin system for new pattern types.",
+            "status": "pending",
+            "testStrategy": "Test pattern detection across diverse codebases, validate confidence scoring accuracy, and verify multi-language support"
+          },
+          {
+            "id": 8,
+            "title": "Implement Notion output formatting and integration",
+            "description": "Build the final integration layer to output structured findings and workflow specifications to Notion Stage Pages",
+            "dependencies": [
+              7
+            ],
+            "details": "Implement NotionOutputFormatter that creates rich-formatted Stage Pages with codebase analysis results. Add structured content organization with headers, code blocks, and analysis summaries. Implement workflow specification embedding in Notion with proper formatting. Add progress tracking and status updates during analysis. Include error reporting and diagnostics in Notion format.",
+            "status": "pending",
+            "testStrategy": "Verify Notion page creation and formatting, test rich content rendering, and validate workflow specification display"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Create simple Implementer agent for MVP",
+        "description": "Build a basic Implementer agent that can read Bootstrapper output and make simple code changes without worktrees",
+        "details": "Develop ImplementerAgent class that reads Bootstrapper output from Notion and generates code changes. Use simple-git ^3.21.0 for git operations. Implement file modification logic with proper backup and rollback capabilities. Add code generation using Claude API with appropriate context from codebase analysis. Include basic conflict detection and resolution. Implement change summarization and documentation generation. Write results back to Notion with formatted code diffs and change summaries. Add support for running tests after changes using child_process to execute npm/yarn/pytest commands. Include validation that changes don't break existing functionality.",
+        "testStrategy": "Test code modification accuracy, git operations validation, rollback functionality, change summary quality, and integration with various project types and test frameworks",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create ImplementerAgent class setup and initialization",
+            "description": "Set up the core ImplementerAgent class with proper TypeScript interfaces, constructor, and basic configuration handling",
+            "dependencies": [],
+            "details": "Create ImplementerAgent class in src/agents/ImplementerAgent.ts with TypeScript interfaces for configuration, Notion integration setup, and basic initialization logic. Include proper error handling, logging setup with winston, and configuration validation. Set up class properties for git operations, file system access, and API clients.",
+            "status": "pending",
+            "testStrategy": "Unit tests for class initialization, configuration validation, and error handling scenarios"
+          },
+          {
+            "id": 2,
+            "title": "Implement file modification logic with backup and rollback",
+            "description": "Build robust file modification system with backup creation and rollback capabilities for safe code changes",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement FileModificationManager class with backup creation using fs-extra ^11.1.1. Create rollback mechanism that can restore files from backups. Add file locking to prevent concurrent modifications. Include validation for file permissions and disk space checks. Implement atomic file operations with temporary files and rename operations.",
+            "status": "pending",
+            "testStrategy": "Test backup creation, rollback functionality, file locking, and atomic operations under various failure scenarios"
+          },
+          {
+            "id": 3,
+            "title": "Integrate git operations using simple-git",
+            "description": "Set up git operations integration for commit creation, branch management, and change tracking",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement GitOperationsManager using simple-git ^3.21.0 for git status checking, staging changes, creating commits with descriptive messages, and branch operations. Add conflict detection and basic resolution strategies. Include git hooks for validation and automated testing. Implement change tracking and diff generation.",
+            "status": "pending",
+            "testStrategy": "Test git operations in various repository states, conflict detection, commit creation, and branch management functionality"
+          },
+          {
+            "id": 4,
+            "title": "Implement Claude API integration for code generation",
+            "description": "Build code generation system using Claude API with proper context management and prompt engineering",
+            "dependencies": [
+              1
+            ],
+            "details": "Create CodeGenerationService class using @anthropic-ai/sdk for Claude API integration. Implement context gathering from codebase analysis, file content reading, and dependency mapping. Build prompt templates for different types of code changes. Add response parsing and code extraction logic. Include token usage tracking and rate limiting.",
+            "status": "pending",
+            "testStrategy": "Test API integration, context gathering accuracy, code generation quality, and error handling for API failures"
+          },
+          {
+            "id": 5,
+            "title": "Build change validation and testing system",
+            "description": "Create comprehensive validation system to verify changes don't break functionality and run appropriate tests",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Implement ChangeValidationService that runs syntax validation, linting checks, and automated tests using child_process to execute npm/yarn/pytest commands. Add static analysis for potential issues, dependency validation, and integration test execution. Include test result parsing and failure analysis. Create validation reports with actionable feedback.",
+            "status": "pending",
+            "testStrategy": "Test validation across different project types, test framework integration, failure detection accuracy, and report generation quality"
+          },
+          {
+            "id": 6,
+            "title": "Implement Notion result reporting with formatted output",
+            "description": "Build system to write implementation results back to Notion with formatted code diffs and change summaries",
+            "dependencies": [
+              5
+            ],
+            "details": "Create NotionReportingService using @notionhq/client ^2.2.15 to update workflow pages with implementation results. Format code diffs using diff2html for readable presentation. Generate change summaries with impact analysis. Include test results, validation outcomes, and next steps. Add rich text formatting, code blocks, and status indicators in Notion pages.",
+            "status": "pending",
+            "testStrategy": "Test Notion page updates, formatting accuracy, code diff presentation, and error handling for API failures"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Implement end-to-end workflow orchestration for MVP",
+        "description": "Connect Bootstrapper and Implementer agents through the orchestration server for complete feature implementation flow",
+        "details": "Enhance OrchestrationServer to handle the full Bootstrapper → Implementer flow. Implement state machine logic using a simple finite state automaton with transitions: pending → bootstrapping → implementing → complete. Add proper error handling and recovery mechanisms. Implement workflow status tracking and progress reporting in Notion. Add configurable timeouts for each stage using node-cron ^3.0.3 for cleanup tasks. Include logging and monitoring with structured JSON logs. Add workflow cancellation and retry capabilities. Implement proper cleanup of temporary resources and failed workflows.",
+        "testStrategy": "End-to-end integration tests with sample feature requests, error scenario testing, timeout handling verification, state transition validation, and workflow cleanup testing",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement state machine for workflow orchestration",
+            "description": "Create a finite state automaton to manage workflow transitions between pending, bootstrapping, implementing, and complete states",
+            "dependencies": [],
+            "details": "Build WorkflowStateMachine class with state definitions and transition rules. Implement validateTransition() method to ensure valid state changes. Create state transition handlers for each phase. Add state persistence to maintain workflow state across server restarts. Include state validation and illegal transition prevention.",
+            "status": "pending",
+            "testStrategy": "Unit tests for all state transitions, validation of illegal transition prevention, and state persistence verification"
+          },
+          {
+            "id": 2,
+            "title": "Implement Bootstrapper to Implementer agent flow coordination",
+            "description": "Create the orchestration logic to coordinate handoff between Bootstrapper and Implementer agents with proper data transfer",
+            "dependencies": [
+              1
+            ],
+            "details": "Build AgentFlowCoordinator class that manages agent lifecycle and data handoff. Implement workflow context transfer between agents using WorkflowContext interface. Add agent status monitoring and progress tracking. Create agent spawn/terminate logic with proper resource management. Include context validation to ensure data integrity during handoffs.",
+            "status": "pending",
+            "testStrategy": "Integration tests with actual agent handoffs, context transfer validation, and agent lifecycle management verification"
+          },
+          {
+            "id": 3,
+            "title": "Implement comprehensive error handling and recovery mechanisms",
+            "description": "Add robust error handling with automatic recovery strategies for workflow failures at any stage",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create WorkflowErrorHandler class with retry logic using exponential backoff. Implement different recovery strategies for each workflow stage. Add error categorization (recoverable vs non-recoverable). Implement workflow rollback mechanisms for critical failures. Include error notification system and failure audit logging.",
+            "status": "pending",
+            "testStrategy": "Error scenario testing for each workflow stage, recovery mechanism validation, and rollback functionality verification"
+          },
+          {
+            "id": 4,
+            "title": "Implement workflow status tracking and Notion progress reporting",
+            "description": "Create comprehensive status tracking system with real-time updates to Notion databases for workflow monitoring",
+            "dependencies": [
+              1
+            ],
+            "details": "Build WorkflowStatusTracker class that updates Notion workflow and stage pages. Implement real-time progress reporting with percentage completion. Add milestone tracking and ETA calculations. Create status dashboard data aggregation. Include historical workflow analytics and performance metrics collection.",
+            "status": "pending",
+            "testStrategy": "Notion integration tests for status updates, progress calculation accuracy verification, and dashboard data validation"
+          },
+          {
+            "id": 5,
+            "title": "Implement timeout management system with node-cron scheduling",
+            "description": "Add configurable timeout handling for each workflow stage using node-cron for automated cleanup and timeout management",
+            "dependencies": [
+              1,
+              3
+            ],
+            "details": "Create TimeoutManager class using node-cron ^3.0.3 for scheduled cleanup tasks. Implement configurable timeouts per workflow stage with environment variable support. Add timeout warning notifications before expiration. Create automatic workflow termination for exceeded timeouts. Include timeout metrics collection and analysis.",
+            "status": "pending",
+            "testStrategy": "Timeout handling verification, cron job execution testing, and cleanup task validation"
+          },
+          {
+            "id": 6,
+            "title": "Implement structured logging and monitoring system",
+            "description": "Add comprehensive logging with structured JSON format and monitoring capabilities for workflow observability",
+            "dependencies": [],
+            "details": "Create WorkflowLogger class that outputs structured JSON logs with correlation IDs. Implement log levels (debug, info, warn, error) with configurable verbosity. Add performance monitoring with execution time tracking. Create log aggregation for workflow analytics. Include health check endpoints and metrics collection for monitoring integration.",
+            "status": "pending",
+            "testStrategy": "Log format validation, correlation ID tracking verification, and monitoring endpoint functionality testing"
+          },
+          {
+            "id": 7,
+            "title": "Implement workflow cleanup and resource management mechanisms",
+            "description": "Create comprehensive cleanup system for temporary resources, failed workflows, and workflow cancellation capabilities",
+            "dependencies": [
+              3,
+              5
+            ],
+            "details": "Build WorkflowCleanupManager class that handles temporary file cleanup, agent resource deallocation, and database cleanup. Implement workflow cancellation with graceful agent termination. Add orphaned workflow detection and cleanup. Create resource leak prevention with automatic cleanup scheduling. Include cleanup audit logging and resource usage tracking.",
+            "status": "pending",
+            "testStrategy": "Resource cleanup verification, cancellation functionality testing, and orphaned workflow detection validation"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Develop Planner agent for three-stage workflow",
+        "description": "Create the Planner agent that bridges Bootstrapper exploration and Implementer execution with detailed specifications",
+        "details": "Build PlannerAgent class that reads Bootstrapper output and creates detailed implementation specifications. Implement specification generation for: API designs (OpenAPI 3.1), database schemas (JSON Schema), component architectures, file-level change plans. Use architectural analysis with madge ^6.1.0 for dependency graphing. Add integration with Claude API for intelligent planning with chain-of-thought prompting. Implement specification validation and consistency checking. Create detailed task breakdowns with clear acceptance criteria. Generate implementation guides with code examples and patterns. Output structured plans to Notion with proper formatting and cross-references.",
+        "testStrategy": "Validate specification quality and completeness, test with complex multi-component features, verify plan consistency, and validate that Implementer can successfully execute generated plans",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create PlannerAgent class foundation",
+            "description": "Build the core PlannerAgent class structure with proper initialization, configuration handling, and basic workflow orchestration capabilities",
+            "dependencies": [],
+            "details": "Implement PlannerAgent class with TypeScript using proper OOP patterns. Include constructor with configuration options, initialize logging with winston, set up error handling and validation. Create methods for reading Bootstrapper output, parsing exploration results, and preparing for specification generation. Add proper TypeScript interfaces for input/output data structures.",
+            "status": "pending",
+            "testStrategy": "Unit tests for class initialization, configuration validation, and basic workflow methods"
+          },
+          {
+            "id": 2,
+            "title": "Implement specification generation for APIs and schemas",
+            "description": "Create comprehensive specification generation capabilities for API designs using OpenAPI 3.1 and database schemas using JSON Schema",
+            "dependencies": [
+              1
+            ],
+            "details": "Build SpecificationGenerator module that creates OpenAPI 3.1 specifications from exploration data. Implement JSON Schema generation for database models and data structures. Create template system for common API patterns and schema structures. Add validation for generated specifications and ensure compliance with standards. Include proper error handling and fallback mechanisms.",
+            "status": "pending",
+            "testStrategy": "Validate OpenAPI 3.1 compliance, test JSON Schema generation accuracy, verify specification completeness"
+          },
+          {
+            "id": 3,
+            "title": "Integrate architectural analysis with madge dependency graphing",
+            "description": "Implement architectural analysis capabilities using madge ^6.1.0 for dependency graphing and structural analysis",
+            "dependencies": [
+              1
+            ],
+            "details": "Install and configure madge ^6.1.0 for dependency analysis. Create ArchitecturalAnalyzer class that generates dependency graphs, identifies circular dependencies, and analyzes code structure. Implement visualization capabilities for dependency relationships. Add analysis of component architectures and module boundaries. Include performance optimization recommendations based on dependency analysis.",
+            "status": "pending",
+            "testStrategy": "Test dependency graph generation, validate circular dependency detection, verify architectural analysis accuracy"
+          },
+          {
+            "id": 4,
+            "title": "Build Claude API integration for intelligent planning",
+            "description": "Implement Claude API integration with chain-of-thought prompting for intelligent specification generation and planning decisions",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Create ClaudeIntegration service using Anthropic SDK. Implement chain-of-thought prompting for complex planning decisions. Build prompt templates for different specification types and planning scenarios. Add intelligent analysis of exploration data to generate optimal implementation approaches. Include retry logic, rate limiting, and proper error handling for API calls.",
+            "status": "pending",
+            "testStrategy": "Test Claude API integration, validate prompt effectiveness, verify planning decision quality"
+          },
+          {
+            "id": 5,
+            "title": "Create specification validation and consistency checking",
+            "description": "Implement comprehensive validation system for generated specifications and consistency checking across different components",
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Build SpecificationValidator class that validates OpenAPI specifications, JSON schemas, and architectural plans. Implement cross-reference checking to ensure consistency between API specs and database schemas. Add validation rules for common patterns and best practices. Create detailed error reporting with suggestions for fixes. Include integration with external validation tools where appropriate.",
+            "status": "pending",
+            "testStrategy": "Test specification validation accuracy, verify consistency checking, validate error reporting quality"
+          },
+          {
+            "id": 6,
+            "title": "Generate detailed task breakdowns with acceptance criteria",
+            "description": "Create system for generating detailed implementation task breakdowns with clear acceptance criteria and implementation guides",
+            "dependencies": [
+              4,
+              5
+            ],
+            "details": "Build TaskBreakdownGenerator that creates detailed implementation tasks from high-level specifications. Generate clear acceptance criteria for each task with measurable outcomes. Create implementation guides with code examples, patterns, and best practices. Add task dependency analysis and optimal sequencing recommendations. Include effort estimation and complexity analysis for each generated task.",
+            "status": "pending",
+            "testStrategy": "Validate task breakdown completeness, test acceptance criteria clarity, verify implementation guide usefulness"
+          },
+          {
+            "id": 7,
+            "title": "Implement Notion output formatting and integration",
+            "description": "Create comprehensive Notion integration for outputting structured plans with proper formatting, cross-references, and organization",
+            "dependencies": [
+              6
+            ],
+            "details": "Build NotionOutputHandler using Notion API SDK. Implement structured page creation with proper formatting for specifications, task breakdowns, and implementation guides. Create cross-reference system between related pages and sections. Add support for code blocks, diagrams, and interactive elements. Include proper error handling and retry logic for Notion API calls. Create templates for different types of planning outputs.",
+            "status": "pending",
+            "testStrategy": "Test Notion page creation, validate formatting quality, verify cross-reference functionality, test error handling"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Update orchestration for three-stage pipeline",
+        "description": "Modify the orchestration server to handle Bootstrapper → Planner → Implementer workflow with conditional stage execution",
+        "details": "Extend OrchestrationServer state machine to include planning stage: pending → bootstrapping → planning → implementing → complete. Implement conditional stage execution based on Bootstrapper's workflow specification (some simple features skip planning). Add stage-specific timeout configurations and error handling. Implement proper state persistence in Notion for workflow recovery after server restarts. Add webhook handling for planning stage completion. Include progress tracking and user notification capabilities. Implement workflow specification validation and sanitization before passing between stages.",
+        "testStrategy": "Test three-stage workflow execution, conditional planning stage skipping, state persistence and recovery, webhook handling for all stages, and error propagation between stages",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Extend state machine to include planning stage",
+            "description": "Modify the OrchestrationServer state machine to add the planning stage between bootstrapping and implementing",
+            "dependencies": [],
+            "details": "Update the state machine from pending → bootstrapping → implementing → complete to pending → bootstrapping → planning → implementing → complete. Modify state transition logic, add planning stage handlers, and update state validation rules. Ensure proper state progression and error handling for the new planning stage.",
+            "status": "pending",
+            "testStrategy": "Test state transitions through all stages, verify planning stage entry/exit conditions, and validate state machine integrity"
+          },
+          {
+            "id": 2,
+            "title": "Implement conditional stage execution logic",
+            "description": "Add logic to conditionally skip the planning stage based on Bootstrapper's workflow specification",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement conditional logic that analyzes the workflow specification from the Bootstrapper to determine if planning stage should be executed. For simple features, allow direct transition from bootstrapping to implementing. Add workflow complexity assessment and stage requirement evaluation. Include configuration options for stage execution policies.",
+            "status": "pending",
+            "testStrategy": "Test simple feature workflows that skip planning, complex workflows that require planning, and edge cases in workflow specification analysis"
+          },
+          {
+            "id": 3,
+            "title": "Implement state persistence in Notion",
+            "description": "Add proper state persistence to Notion database for workflow recovery after server restarts",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement state persistence layer that saves orchestration state to Notion database. Include workflow progress, current stage, stage-specific data, and recovery information. Add state restoration logic for server startup that can resume workflows from any stage. Implement proper error handling and data consistency checks for state persistence operations.",
+            "status": "pending",
+            "testStrategy": "Test state persistence across server restarts, validate workflow recovery from different stages, and verify data consistency during persistence operations"
+          },
+          {
+            "id": 4,
+            "title": "Add webhook handling for planning stage completion",
+            "description": "Implement webhook endpoints and handlers for planning stage completion notifications",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create webhook endpoints to receive planning stage completion notifications. Implement webhook validation, authentication, and proper request handling. Add event processing logic that triggers state transitions when planning stage completes. Include retry mechanisms and error handling for webhook processing. Add logging and monitoring for webhook events.",
+            "status": "pending",
+            "testStrategy": "Test webhook reception and processing, validate authentication mechanisms, test error handling and retry logic, and verify proper state transitions from webhook events"
+          },
+          {
+            "id": 5,
+            "title": "Implement workflow specification validation and sanitization",
+            "description": "Add validation and sanitization for workflow specifications passed between stages",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement comprehensive validation for workflow specifications using JSON schema validation. Add sanitization logic to clean and normalize workflow data before passing between stages. Include security checks to prevent injection attacks and data corruption. Add specification versioning support and backward compatibility handling. Implement error reporting for invalid specifications.",
+            "status": "pending",
+            "testStrategy": "Test workflow specification validation with valid and invalid inputs, verify sanitization effectiveness, test security measures against malicious inputs, and validate error reporting accuracy"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Implement subagent task management system",
+        "description": "Add capability for stage agents to spawn and coordinate subagents through Notion task database",
+        "details": "Extend agent base classes to support subagent spawning. Implement SubagentTaskManager that creates tasks in Notion Subagent Tasks DB and tracks their execution. Add parallel execution capability using Promise.allSettled() for concurrent subagent coordination. Implement task result synthesis where parent agents combine subagent outputs. Add subagent configuration validation and resource allocation. Implement dependency resolution between subagents using topological sorting with toposort ^2.0.2. Add proper error handling and partial failure recovery. Include subagent output formatting and standardization.",
+        "testStrategy": "Test parallel subagent execution, task dependency resolution, result synthesis quality, error handling with partial failures, and resource cleanup after subagent completion",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement SubagentTaskManager class foundation",
+            "description": "Create the core SubagentTaskManager class that handles subagent task creation and tracking in Notion database",
+            "dependencies": [],
+            "details": "Build SubagentTaskManager class with methods: createSubagentTask(), trackExecution(), updateTaskStatus(). Integrate with Notion Subagent Tasks DB using NotionService. Implement task metadata storage including parent agent ID, execution context, and resource allocation. Add proper TypeScript interfaces for subagent task configuration and state management.",
+            "status": "pending",
+            "testStrategy": "Unit tests for task creation, tracking methods, and Notion integration. Mock Notion API calls and verify proper task metadata handling."
+          },
+          {
+            "id": 2,
+            "title": "Implement parallel execution with Promise handling",
+            "description": "Add concurrent subagent execution capability using Promise.allSettled() for coordinating multiple subagents",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement executeSubagentsParallel() method using Promise.allSettled() to handle concurrent execution. Add resource pooling to limit concurrent subagents. Implement execution timeout handling and progress monitoring. Create SubagentExecutor class to manage individual subagent lifecycles with proper cleanup on completion or failure.",
+            "status": "pending",
+            "testStrategy": "Test concurrent execution limits, timeout handling, progress monitoring accuracy, and resource cleanup after parallel execution completion."
+          },
+          {
+            "id": 3,
+            "title": "Implement task result synthesis system",
+            "description": "Create result aggregation and synthesis logic for combining outputs from multiple subagents",
+            "dependencies": [
+              2
+            ],
+            "details": "Build ResultSynthesizer class that aggregates subagent outputs into coherent final results. Implement result merging strategies: concatenation, prioritization, and conflict resolution. Add output standardization to ensure consistent format across different subagent types. Include metadata preservation for traceability and debugging.",
+            "status": "pending",
+            "testStrategy": "Test result synthesis quality with various output types, verify conflict resolution accuracy, and validate metadata preservation through synthesis process."
+          },
+          {
+            "id": 4,
+            "title": "Implement subagent configuration validation",
+            "description": "Add comprehensive validation system for subagent configurations and resource allocation",
+            "dependencies": [
+              1
+            ],
+            "details": "Create SubagentConfigValidator class with schema validation using Joi or Zod. Implement resource allocation validation: memory limits, execution time bounds, and dependency constraints. Add configuration sanitization and default value injection. Include validation for subagent type compatibility and capability requirements.",
+            "status": "pending",
+            "testStrategy": "Test configuration validation with invalid inputs, resource limit enforcement, and compatibility checking between different subagent types."
+          },
+          {
+            "id": 5,
+            "title": "Implement dependency resolution with topological sorting",
+            "description": "Add dependency resolution system using topological sorting for proper subagent execution order",
+            "dependencies": [
+              4
+            ],
+            "details": "Integrate toposort ^2.0.2 library for dependency resolution. Implement DependencyResolver class that analyzes subagent dependencies and creates execution order. Add circular dependency detection and resolution. Include dynamic dependency updates during execution and proper error handling for unresolvable dependencies.",
+            "status": "pending",
+            "testStrategy": "Test dependency resolution with complex dependency graphs, circular dependency detection, and dynamic dependency handling during execution."
+          },
+          {
+            "id": 6,
+            "title": "Implement error handling and partial failure recovery",
+            "description": "Add comprehensive error handling system with partial failure recovery capabilities",
+            "dependencies": [
+              3,
+              5
+            ],
+            "details": "Implement ErrorHandler class with partial failure recovery strategies: retry mechanisms, fallback subagents, and graceful degradation. Add error categorization: transient, permanent, and recoverable errors. Implement compensation actions for failed subagents and state rollback mechanisms. Include detailed error logging and notification system.",
+            "status": "pending",
+            "testStrategy": "Test error handling with various failure scenarios, verify partial recovery accuracy, validate compensation actions, and test state rollback functionality."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Build Git worktree management system",
+        "description": "Implement Git worktree creation, management, and cleanup for parallel implementation agents",
+        "details": "Create GitWorktreeManager class using simple-git ^3.21.0 with methods for: createWorktree(), cleanupWorktree(), listWorktrees(), validateWorktree(). Implement proper naming conventions for worktrees (impl-<feature>-<component>-<timestamp>). Add worktree isolation and conflict prevention. Implement automatic cleanup on workflow completion or failure using process.on('exit') handlers. Add support for multiple repositories with independent worktree management. Include worktree health checking and validation. Implement proper error handling for git operations and repository state issues.",
+        "testStrategy": "Test worktree creation and cleanup, multi-repo worktree management, conflict prevention, error handling for git failures, and cleanup on various exit scenarios",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement GitWorktreeManager class with core methods",
+            "description": "Create the main GitWorktreeManager class with essential methods for worktree operations using simple-git library",
+            "dependencies": [],
+            "details": "Implement GitWorktreeManager class using simple-git ^3.21.0 with core methods: createWorktree(), cleanupWorktree(), listWorktrees(), validateWorktree(). Set up class constructor with repository path parameter and initialize simple-git instance. Add proper TypeScript interfaces for worktree data structures and method parameters.",
+            "status": "pending",
+            "testStrategy": "Unit tests for each method, mock simple-git operations, test with valid and invalid repository paths"
+          },
+          {
+            "id": 2,
+            "title": "Implement worktree creation and naming conventions",
+            "description": "Develop worktree creation logic with standardized naming patterns and conflict prevention",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement proper naming conventions for worktrees using pattern: impl-<feature>-<component>-<timestamp>. Add worktree isolation and conflict prevention by checking for existing worktrees with similar names. Include path validation and ensure worktree directories don't conflict with existing files or directories.",
+            "status": "pending",
+            "testStrategy": "Test naming convention generation, verify conflict detection works, test worktree creation in various scenarios"
+          },
+          {
+            "id": 3,
+            "title": "Add cleanup and lifecycle management with exit handlers",
+            "description": "Implement automatic cleanup mechanisms and lifecycle management for worktrees",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement automatic cleanup on workflow completion or failure using process.on('exit') handlers. Add cleanup tracking to ensure orphaned worktrees are removed. Include graceful shutdown handling and cleanup on SIGINT/SIGTERM signals. Add worktree health checking and validation to detect corrupted or abandoned worktrees.",
+            "status": "pending",
+            "testStrategy": "Test cleanup on normal exit, test cleanup on process termination, verify orphaned worktree detection and removal"
+          },
+          {
+            "id": 4,
+            "title": "Implement multi-repository support",
+            "description": "Add support for managing worktrees across multiple repositories independently",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Extend GitWorktreeManager to support multiple repositories with independent worktree management. Add repository registry to track multiple git repositories. Implement repository-specific worktree operations and ensure isolation between different repositories. Add methods to switch context between repositories.",
+            "status": "pending",
+            "testStrategy": "Test worktree operations across multiple repositories, verify isolation between repositories, test context switching"
+          },
+          {
+            "id": 5,
+            "title": "Add comprehensive error handling for git operations",
+            "description": "Implement robust error handling for all git operations and repository state issues",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Create comprehensive error handling for git operations and repository state issues. Add custom error classes for different failure types (GitWorktreeError, RepositoryStateError, etc.). Implement retry logic for transient failures. Add validation for repository state before operations and meaningful error messages for common failure scenarios.",
+            "status": "pending",
+            "testStrategy": "Test error handling for various git failure scenarios, verify retry logic works correctly, test with corrupted repositories"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Enhance Implementer agents for parallel execution in worktrees",
+        "description": "Modify Implementer agents to work in isolated Git worktrees for true parallel code modification",
+        "details": "Refactor ImplementerAgent to work within git worktrees using GitWorktreeManager from task 11. Implement worktree-specific context isolation and configuration. Add parallel execution support where multiple Implementer subagents work simultaneously on different components. Implement cross-worktree coordination for shared dependencies. Add proper change tracking and diff generation for worktree-specific modifications. Include PR/MR creation capabilities using octokit ^3.1.2 for GitHub integration. Implement change validation and testing within worktrees before merging.",
+        "testStrategy": "Test parallel implementation in multiple worktrees, change isolation verification, cross-worktree coordination, PR creation functionality, and merge conflict detection and resolution",
+        "priority": "medium",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Refactor ImplementerAgent to work with Git worktrees",
+            "description": "Modify the existing ImplementerAgent class to integrate with GitWorktreeManager from task 11 and operate within isolated Git worktrees instead of the main repository",
+            "dependencies": [
+              11
+            ],
+            "details": "Update ImplementerAgent constructor to accept worktree path and GitWorktreeManager instance. Modify all file operations to work within the worktree directory. Update git operations to use worktree-specific commands. Ensure the agent can switch between different worktrees and maintain state isolation. Add worktree validation and error handling for worktree-specific operations.",
+            "status": "pending",
+            "testStrategy": "Unit tests for worktree integration, file operation validation within worktrees, and agent state isolation verification"
+          },
+          {
+            "id": 2,
+            "title": "Implement worktree-specific context isolation and configuration",
+            "description": "Create a context isolation system that ensures each ImplementerAgent working in a worktree has access to only its relevant configuration and state data",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop WorktreeContext class to manage isolated configuration, environment variables, and temporary state for each worktree. Implement context switching mechanisms that prevent cross-contamination between parallel agents. Create configuration inheritance system from main project to worktree-specific overrides. Add context cleanup and resource management for completed or failed worktree operations.",
+            "status": "pending",
+            "testStrategy": "Context isolation tests, configuration inheritance validation, and resource cleanup verification"
+          },
+          {
+            "id": 3,
+            "title": "Add parallel execution support for multiple Implementer subagents",
+            "description": "Implement parallel processing capabilities that allow multiple ImplementerAgent instances to work simultaneously on different components using separate worktrees",
+            "dependencies": [
+              2
+            ],
+            "details": "Create ParallelImplementerManager class to coordinate multiple ImplementerAgent instances. Implement task distribution logic that assigns different components to different agents based on dependency analysis. Add worker pool management with configurable concurrency limits. Implement progress tracking and status reporting for parallel operations. Include error handling and recovery mechanisms for failed parallel tasks.",
+            "status": "pending",
+            "testStrategy": "Parallel execution stress tests, task distribution validation, and error recovery testing"
+          },
+          {
+            "id": 4,
+            "title": "Implement cross-worktree coordination for shared dependencies",
+            "description": "Create a coordination system that manages shared dependencies and prevents conflicts when multiple agents modify related code simultaneously",
+            "dependencies": [
+              3
+            ],
+            "details": "Develop WorktreeCoordinator class that tracks shared dependencies across different worktrees. Implement locking mechanisms for shared resources and dependency conflict detection. Create communication channels between worktree agents for dependency notifications. Add dependency resolution strategies for when multiple agents need to modify the same shared component. Implement rollback coordination for failed multi-worktree operations.",
+            "status": "pending",
+            "testStrategy": "Shared dependency conflict tests, locking mechanism validation, and multi-agent coordination scenarios"
+          },
+          {
+            "id": 5,
+            "title": "Add change tracking and diff generation for worktree modifications",
+            "description": "Implement comprehensive change tracking that monitors all modifications within worktrees and generates detailed diffs for review and merging",
+            "dependencies": [
+              2
+            ],
+            "details": "Create WorktreeChangeTracker class that monitors file modifications, additions, and deletions within each worktree. Implement diff generation using git diff and custom formatting for clear change visualization. Add change categorization (new files, modified files, deleted files, moved files). Create change summary generation with impact analysis. Implement change validation and quality checks before proposing merges.",
+            "status": "pending",
+            "testStrategy": "Change tracking accuracy tests, diff generation validation, and change summary quality verification"
+          },
+          {
+            "id": 6,
+            "title": "Implement PR/MR creation capabilities using octokit integration",
+            "description": "Add automated pull request and merge request creation functionality using octokit ^3.1.2 for GitHub integration and similar tools for other Git platforms",
+            "dependencies": [
+              5
+            ],
+            "details": "Install and configure octokit ^3.1.2 for GitHub API integration. Create PullRequestManager class that generates PR descriptions from worktree changes and diff summaries. Implement automated branch creation from worktrees with proper naming conventions. Add PR template population with change summaries, test results, and review requirements. Include support for draft PRs and auto-assignment to reviewers based on changed files.",
+            "status": "pending",
+            "testStrategy": "GitHub API integration tests, PR creation validation, and branch management verification"
+          },
+          {
+            "id": 7,
+            "title": "Add change validation and testing within worktrees before merging",
+            "description": "Implement comprehensive validation and testing system that runs within each worktree to ensure changes are safe before creating pull requests",
+            "dependencies": [
+              4,
+              6
+            ],
+            "details": "Create WorktreeValidator class that runs project-specific tests within each worktree environment. Implement lint checking, type checking, and unit test execution within worktrees. Add integration test support where applicable and safe. Create validation report generation that summarizes test results and identifies potential issues. Implement pre-merge validation gates that prevent PR creation if critical validations fail.",
+            "status": "pending",
+            "testStrategy": "Validation pipeline tests, test execution within worktrees, and validation gate functionality verification"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Implement multi-repository support and coordination",
+        "description": "Add capability for workflows to span multiple repositories with proper cross-repo coordination",
+        "details": "Extend repository management to handle multiple repos per workflow. Implement CrossRepoCoordinator that manages dependencies and changes across repositories. Add repository discovery and configuration management with support for monorepos and multi-repo setups. Implement cross-repo context sharing through Notion and temporary artifact storage. Add support for different repository types (Git, GitHub, GitLab) using a plugin architecture. Include cross-repo change validation and testing coordination. Implement proper cleanup and rollback across multiple repositories on workflow failure.",
+        "testStrategy": "Test workflows spanning multiple repositories, cross-repo dependency management, change coordination accuracy, rollback functionality across repos, and various repository provider integrations",
+        "priority": "low",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Extend repository management for multi-repo workflows",
+            "description": "Modify existing repository management to handle multiple repositories within a single workflow context",
+            "dependencies": [],
+            "details": "Extend the current repository management system to support multiple repositories per workflow. Update data structures to store multiple repo references, modify workflow state to track per-repo status, and ensure proper isolation between repositories while maintaining workflow cohesion.",
+            "status": "pending",
+            "testStrategy": "Unit tests for multi-repo state management, integration tests with multiple repositories, and workflow isolation verification"
+          },
+          {
+            "id": 2,
+            "title": "Implement CrossRepoCoordinator core functionality",
+            "description": "Create the main coordinator class that manages dependencies and changes across multiple repositories",
+            "dependencies": [
+              1
+            ],
+            "details": "Build CrossRepoCoordinator class with methods for coordinating changes across repositories, managing inter-repo dependencies, tracking change propagation, and ensuring consistency. Include dependency graph resolution and change ordering algorithms.",
+            "status": "pending",
+            "testStrategy": "Unit tests for dependency resolution, integration tests for change coordination, and complex multi-repo scenario testing"
+          },
+          {
+            "id": 3,
+            "title": "Implement repository discovery and configuration management",
+            "description": "Add system for discovering repositories and managing their configuration in monorepo and multi-repo setups",
+            "dependencies": [],
+            "details": "Create repository discovery service that can identify repositories in monorepo structures and configure multi-repo setups. Include configuration validation, repository metadata extraction, and support for different repository layouts and structures.",
+            "status": "pending",
+            "testStrategy": "Test with various monorepo structures, multi-repo configurations, and repository discovery accuracy validation"
+          },
+          {
+            "id": 4,
+            "title": "Implement cross-repo context sharing system",
+            "description": "Build system for sharing context and data between repositories through Notion and temporary storage",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Create context sharing mechanism using Notion for persistent storage and temporary artifacts for workflow data. Implement context serialization, data synchronization between repositories, and efficient context retrieval with proper access controls and data consistency guarantees.",
+            "status": "pending",
+            "testStrategy": "Test context synchronization accuracy, data consistency across repos, and performance with large context data"
+          },
+          {
+            "id": 5,
+            "title": "Build plugin architecture for repository providers",
+            "description": "Create extensible plugin system to support different repository types like Git, GitHub, and GitLab",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and implement plugin architecture with common repository interface, provider-specific implementations for Git, GitHub, and GitLab. Include plugin discovery, loading mechanism, and standardized API for repository operations across different providers.",
+            "status": "pending",
+            "testStrategy": "Test plugin loading and discovery, verify provider-specific functionality, and integration tests with different repository types"
+          },
+          {
+            "id": 6,
+            "title": "Implement cross-repo change validation system",
+            "description": "Add validation and testing coordination across multiple repositories to ensure change consistency",
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Build validation system that coordinates testing across repositories, validates cross-repo dependencies, ensures change compatibility, and runs distributed validation workflows. Include conflict detection and resolution mechanisms.",
+            "status": "pending",
+            "testStrategy": "Test validation accuracy across repos, conflict detection effectiveness, and distributed testing coordination"
+          },
+          {
+            "id": 7,
+            "title": "Implement rollback coordination system",
+            "description": "Create system for coordinating rollbacks across multiple repositories when workflow failures occur",
+            "dependencies": [
+              2,
+              5,
+              6
+            ],
+            "details": "Build rollback coordination system that can safely revert changes across multiple repositories in correct order, handle partial rollback scenarios, maintain transaction-like semantics, and ensure repository consistency during failure recovery.",
+            "status": "pending",
+            "testStrategy": "Test rollback scenarios with various failure points, partial rollback handling, and repository consistency verification"
+          },
+          {
+            "id": 8,
+            "title": "Complete repository provider integrations",
+            "description": "Finalize integrations with specific repository providers and ensure full feature compatibility",
+            "dependencies": [
+              5,
+              7
+            ],
+            "details": "Complete implementation of provider-specific features, ensure full API compatibility, add provider-specific optimizations, implement authentication and authorization for each provider, and add comprehensive error handling for provider-specific scenarios.",
+            "status": "pending",
+            "testStrategy": "Integration tests with real provider APIs, authentication testing, feature compatibility verification, and end-to-end workflow testing"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Integrate Claude Skills system for dynamic expertise loading",
+        "description": "Add support for loading Claude Skills based on workflow requirements to provide domain-specific expertise",
+        "details": "Implement SkillsManager that loads and configures Claude Skills (.md files) based on workflow specifications. Create skill discovery and mapping system that matches task types to appropriate skills. Add support for both public skills (/mnt/skills/public/) and custom team skills (/mnt/skills/user/). Implement skill combination and conflict resolution when multiple skills are needed. Add skill validation and format checking. Create dynamic skill loading in agent spawning with proper file system access. Include skill effectiveness tracking and optimization suggestions.",
+        "testStrategy": "Test skill loading and application, validate skill effectiveness on code quality, verify skill combination logic, and test custom skill creation and management",
+        "priority": "low",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement SkillsManager core class and file system operations",
+            "description": "Create the foundational SkillsManager class that handles loading, parsing, and managing Claude Skills from the file system",
+            "dependencies": [],
+            "details": "Build SkillsManager class with methods for loadSkill(), parseSkillFile(), validateSkillFormat(), and cacheSkill(). Implement file system operations to read .md files from both /mnt/skills/public/ and /mnt/skills/user/ directories. Add error handling for file access permissions and missing files. Create skill metadata extraction from markdown frontmatter and content parsing. Implement skill caching mechanism for performance optimization.",
+            "status": "pending",
+            "testStrategy": "Unit tests for file loading operations, skill parsing validation, cache functionality testing, and error handling for invalid file formats"
+          },
+          {
+            "id": 2,
+            "title": "Create skill discovery and mapping system",
+            "description": "Build the system that automatically discovers available skills and maps them to appropriate task types and workflow requirements",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement skill discovery engine that scans skill directories and builds skill registry. Create mapping logic that matches task types (code analysis, documentation, testing, etc.) to relevant skills based on skill metadata and tags. Build skill recommendation system that suggests optimal skills for given workflow contexts. Add support for skill categorization and filtering. Implement skill ranking system based on relevance scores.",
+            "status": "pending",
+            "testStrategy": "Test skill discovery across different directory structures, validate mapping accuracy for various task types, and verify recommendation system effectiveness"
+          },
+          {
+            "id": 3,
+            "title": "Implement public and custom skill support with access control",
+            "description": "Add comprehensive support for both public skills and custom team skills with proper access control and management",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement dual-path skill loading for public skills (/mnt/skills/public/) and custom skills (/mnt/skills/user/). Add access control mechanisms for team-specific skills with proper permission validation. Create skill namespace management to prevent conflicts between public and custom skills. Implement skill versioning support and update mechanisms. Add custom skill creation and editing capabilities with validation workflows.",
+            "status": "pending",
+            "testStrategy": "Test access control for custom skills, validate namespace isolation, verify skill versioning functionality, and test custom skill creation workflows"
+          },
+          {
+            "id": 4,
+            "title": "Build skill combination and conflict resolution system",
+            "description": "Create the logic for combining multiple skills and resolving conflicts when skills have overlapping or contradictory instructions",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Implement skill combination engine that merges multiple skills into cohesive expertise profiles. Create conflict detection system that identifies contradictory instructions between skills. Build conflict resolution strategies including priority-based resolution, user-defined preferences, and intelligent merging. Add skill compatibility checking to prevent incompatible skill combinations. Implement skill override mechanisms for custom team preferences.",
+            "status": "pending",
+            "testStrategy": "Test skill combination scenarios with multiple skills, validate conflict detection accuracy, verify resolution strategies effectiveness, and test override mechanisms"
+          },
+          {
+            "id": 5,
+            "title": "Create skill validation and format checking system",
+            "description": "Implement comprehensive validation system for skill files to ensure proper format, content quality, and system compatibility",
+            "dependencies": [
+              1
+            ],
+            "details": "Build skill format validator that checks markdown structure, frontmatter schema, and content formatting. Implement content quality checks for skill instructions including completeness, clarity, and actionability. Create compatibility validation to ensure skills work with current system versions. Add skill linting with suggestions for improvement. Implement automated skill testing framework to validate skill effectiveness.",
+            "status": "pending",
+            "testStrategy": "Test validation rules with various skill formats, verify quality checks accuracy, validate compatibility detection, and test automated skill effectiveness measurement"
+          },
+          {
+            "id": 6,
+            "title": "Integrate dynamic skill loading into agent spawning system",
+            "description": "Add dynamic skill loading capabilities to the agent spawning process with performance optimization and effectiveness tracking",
+            "dependencies": [
+              4,
+              5
+            ],
+            "details": "Integrate SkillsManager with agent spawning system to dynamically load relevant skills based on workflow specifications. Implement skill injection into agent context with proper formatting and priority ordering. Add performance optimization for skill loading with caching and lazy loading strategies. Create skill effectiveness tracking system that monitors skill impact on code quality and task completion. Implement optimization suggestions based on skill usage analytics.",
+            "status": "pending",
+            "testStrategy": "Test dynamic skill loading in agent spawning, validate skill injection accuracy, verify performance optimizations effectiveness, and test skill tracking and analytics functionality"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Develop MCP server integrations for specialized capabilities",
+        "description": "Create and integrate custom MCP servers for codebase search, pattern analysis, and cross-repo operations",
+        "details": "Build custom MCP servers using the latest MCP SDK: 1) Codebase Search MCP with AST-aware search using @babel/traverse ^7.23.6, ripgrep integration, and semantic search. 2) Pattern Analysis MCP for architecture pattern detection and code convention discovery. 3) Cross-Repo Search MCP for finding related code across multiple repositories. Implement MCP server discovery and configuration management. Add proper error handling and timeout management for MCP calls. Include MCP server health checking and fallback mechanisms. Create documentation and examples for custom MCP development.",
+        "testStrategy": "Test MCP server functionality independently, validate integration with agents, verify performance with large codebases, and test error handling and fallback scenarios",
+        "priority": "low",
+        "dependencies": [
+          14
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Codebase Search MCP server project structure",
+            "description": "Initialize the Codebase Search MCP server project with proper TypeScript configuration, dependencies, and project structure",
+            "dependencies": [],
+            "details": "Create new Node.js project with TypeScript setup. Install MCP SDK dependencies and configure tsconfig.json. Set up project structure with src/, dist/, and test/ directories. Install required dependencies including @babel/traverse ^7.23.6 for AST parsing, ripgrep bindings for fast text search, and vector embedding libraries for semantic search capabilities. Configure package.json with proper scripts for build, test, and development.",
+            "status": "pending",
+            "testStrategy": "Verify project builds successfully, all dependencies resolve correctly, and TypeScript compilation works without errors"
+          },
+          {
+            "id": 2,
+            "title": "Implement AST-aware search functionality",
+            "description": "Build the core AST-aware search capabilities using Babel traverse for JavaScript/TypeScript code analysis",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement AST parsing and traversal using @babel/traverse to enable semantic code search. Create search handlers for different node types (functions, classes, imports, variables). Build query language for AST-based searches (e.g., find all functions with specific parameters, locate class inheritance patterns). Integrate ripgrep for fast text-based preprocessing before AST analysis. Add support for multiple file types and language-specific AST parsers.",
+            "status": "pending",
+            "testStrategy": "Test AST parsing accuracy across different JavaScript/TypeScript codebases, validate search query performance, and verify semantic search results match expected patterns"
+          },
+          {
+            "id": 3,
+            "title": "Develop Pattern Analysis MCP server",
+            "description": "Create the Pattern Analysis MCP server for detecting architecture patterns and code conventions",
+            "dependencies": [
+              1
+            ],
+            "details": "Build MCP server focused on architectural pattern detection. Implement analyzers for common patterns: MVC, MVP, MVVM, Observer, Factory, Singleton, etc. Create code convention discovery by analyzing existing codebases for naming patterns, file organization, and coding standards. Build pattern confidence scoring and recommendation system. Add integration with static analysis tools and linting rule extraction. Implement caching for pattern analysis results.",
+            "status": "pending",
+            "testStrategy": "Validate pattern detection accuracy against known codebases, test convention discovery across different project types, and verify performance with large-scale repositories"
+          },
+          {
+            "id": 4,
+            "title": "Build Cross-Repo Search MCP server",
+            "description": "Implement the Cross-Repo Search MCP server for finding related code across multiple repositories",
+            "dependencies": [
+              1
+            ],
+            "details": "Create MCP server that can search across multiple Git repositories simultaneously. Implement repository indexing and caching system. Build cross-repo relationship detection (shared dependencies, similar code patterns, API usage). Add support for different repository hosting platforms (GitHub, GitLab, Bitbucket). Implement parallel search execution with proper resource management. Add deduplication and ranking for cross-repo search results.",
+            "status": "pending",
+            "testStrategy": "Test search accuracy across multiple repositories, validate performance with large repository sets, and verify proper handling of access permissions and authentication"
+          },
+          {
+            "id": 5,
+            "title": "Implement MCP server discovery and configuration management",
+            "description": "Build the discovery and configuration system for managing multiple MCP servers",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Create MCP server registry and discovery mechanism. Implement configuration management for server connections, endpoints, and capabilities. Build server capability negotiation and version compatibility checking. Add dynamic server loading and unloading capabilities. Implement configuration validation and server dependency resolution. Create unified configuration format for all MCP servers.",
+            "status": "pending",
+            "testStrategy": "Test server discovery across different network configurations, validate configuration management with multiple server types, and verify proper error handling for unavailable servers"
+          },
+          {
+            "id": 6,
+            "title": "Add error handling, timeout management, and health checking",
+            "description": "Implement comprehensive error handling, timeout management, and health checking mechanisms for MCP servers",
+            "dependencies": [
+              5
+            ],
+            "details": "Build robust error handling for MCP server communication failures. Implement configurable timeout management for different operation types. Create health checking system with periodic server availability verification. Add fallback mechanisms for when primary servers are unavailable. Implement retry logic with exponential backoff for transient failures. Create monitoring and alerting for server health status.",
+            "status": "pending",
+            "testStrategy": "Test error handling under various failure scenarios, validate timeout behavior with slow servers, verify health checking accuracy, and test fallback mechanisms"
+          },
+          {
+            "id": 7,
+            "title": "Create documentation and examples for custom MCP development",
+            "description": "Develop comprehensive documentation and example projects for custom MCP server development",
+            "dependencies": [
+              6
+            ],
+            "details": "Create detailed documentation covering MCP server development patterns, best practices, and API reference. Build example MCP servers demonstrating different use cases and integration patterns. Create step-by-step tutorials for custom MCP development. Add troubleshooting guides and common pitfall documentation. Create template projects for quick MCP server bootstrapping. Include performance optimization guidelines and testing strategies.",
+            "status": "pending",
+            "testStrategy": "Validate documentation completeness through developer testing, verify all examples work correctly, and test template projects in clean environments"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Add comprehensive error handling and recovery mechanisms",
+        "description": "Implement robust error handling, logging, monitoring, and recovery capabilities across all system components",
+        "details": "Create comprehensive error handling with custom error classes extending Error for different failure types. Implement structured logging with winston ^3.11.0 and log levels (error, warn, info, debug). Add distributed tracing with opentelemetry ^1.19.0 for debugging complex workflows. Implement automatic retry logic with exponential backoff using p-retry ^6.2.0. Add health checks for all system components and external dependencies. Create workflow recovery mechanisms that can resume from last known good state. Include alerting and notification systems for critical failures using nodemailer ^6.9.8.",
+        "testStrategy": "Test error scenarios across all components, validate retry logic effectiveness, verify logging and monitoring coverage, test recovery mechanisms, and validate alerting functionality",
+        "priority": "medium",
+        "dependencies": [
+          15
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create custom error classes and error type hierarchy",
+            "description": "Design and implement a comprehensive set of custom error classes extending the base Error class for different failure types across the system",
+            "dependencies": [],
+            "details": "Create a structured error hierarchy with base CustomError class and specific error types like ValidationError, NetworkError, DatabaseError, AuthenticationError, WorkflowError, and ConfigurationError. Each error class should include error codes, severity levels, and contextual information. Implement error serialization for logging and monitoring purposes.",
+            "status": "pending",
+            "testStrategy": "Unit tests for each error class, validation of error inheritance chain, testing error serialization/deserialization, and verification of error context preservation"
+          },
+          {
+            "id": 2,
+            "title": "Implement structured logging system with winston",
+            "description": "Set up comprehensive logging infrastructure using winston with proper log levels, formatting, and output destinations",
+            "dependencies": [
+              1
+            ],
+            "details": "Configure winston logger with multiple transports (console, file, remote). Implement structured logging with JSON format including timestamp, level, service name, trace ID, and contextual metadata. Create log rotation policies and configure different log levels (error, warn, info, debug) with appropriate filtering. Add correlation IDs for request tracking.",
+            "status": "pending",
+            "testStrategy": "Test log output formatting, verify log level filtering works correctly, validate log rotation functionality, and test performance impact of logging operations"
+          },
+          {
+            "id": 3,
+            "title": "Integrate distributed tracing with OpenTelemetry",
+            "description": "Implement distributed tracing capabilities using OpenTelemetry for comprehensive request flow monitoring and debugging",
+            "dependencies": [
+              2
+            ],
+            "details": "Set up OpenTelemetry SDK with auto-instrumentation for HTTP requests, database queries, and external API calls. Configure trace exporters for monitoring platforms. Implement custom spans for business logic operations and workflow steps. Add trace correlation with structured logging using trace and span IDs.",
+            "status": "pending",
+            "testStrategy": "Validate trace generation across service boundaries, verify span relationships and timing accuracy, test trace export functionality, and validate correlation with log entries"
+          },
+          {
+            "id": 4,
+            "title": "Implement retry logic with exponential backoff using p-retry",
+            "description": "Create robust retry mechanisms with exponential backoff for handling transient failures across all system operations",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement configurable retry logic using p-retry library with exponential backoff, jitter, and maximum retry limits. Create retry policies for different operation types (API calls, database operations, file operations). Add retry metrics collection and logging. Implement circuit breaker patterns for persistent failures.",
+            "status": "pending",
+            "testStrategy": "Test retry behavior under various failure scenarios, validate exponential backoff timing, verify circuit breaker functionality, and test retry metrics accuracy"
+          },
+          {
+            "id": 5,
+            "title": "Create health check system for all components",
+            "description": "Implement comprehensive health monitoring for all system components and external dependencies with status reporting",
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Create health check endpoints for each service component including database connectivity, external API availability, file system access, and memory/CPU usage. Implement health check aggregation and status reporting. Add dependency health validation and cascade failure detection. Create health check scheduling and alerting mechanisms.",
+            "status": "pending",
+            "testStrategy": "Test health checks under normal and failure conditions, validate health status aggregation accuracy, test alerting mechanisms, and verify performance impact of health monitoring"
+          },
+          {
+            "id": 6,
+            "title": "Build workflow recovery and state restoration mechanisms",
+            "description": "Implement comprehensive workflow recovery capabilities that can resume operations from the last known good state after failures",
+            "dependencies": [
+              3,
+              4,
+              5
+            ],
+            "details": "Design workflow state persistence using checkpoint mechanism. Implement recovery logic that can detect incomplete workflows and resume from last successful step. Create workflow state validation and integrity checks. Add rollback capabilities for failed operations. Integrate with alerting system using nodemailer for critical failure notifications.",
+            "status": "pending",
+            "testStrategy": "Test workflow interruption and recovery scenarios, validate state persistence accuracy, test rollback functionality, verify alerting delivery, and test recovery performance"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Create configuration management and deployment system",
+        "description": "Build comprehensive configuration management, environment setup, and deployment automation",
+        "details": "Implement configuration management using dotenv ^16.3.1 and config validation with joi ^17.11.0. Create environment-specific configurations (development, staging, production). Add deployment scripts and Docker containerization with multi-stage builds. Implement configuration validation and environment health checks. Create setup automation scripts for new installations. Add configuration documentation and examples. Include secrets management and secure configuration handling. Create backup and restoration procedures for Notion data and system state.",
+        "testStrategy": "Test configuration validation, environment setup automation, Docker deployment, secrets management security, and backup/restore procedures",
+        "priority": "medium",
+        "dependencies": [
+          16
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement configuration management with dotenv and joi validation",
+            "description": "Set up configuration management system using dotenv for environment variables and joi for schema validation",
+            "dependencies": [],
+            "details": "Install and configure dotenv ^16.3.1 for environment variable loading. Implement joi ^17.11.0 for configuration schema validation. Create configuration classes with type safety. Add validation for required environment variables. Implement configuration loading with error handling and meaningful error messages. Create configuration interfaces and types for TypeScript support.",
+            "status": "pending",
+            "testStrategy": "Unit tests for configuration validation, schema enforcement tests, missing environment variable handling, and type safety verification"
+          },
+          {
+            "id": 2,
+            "title": "Create environment-specific configurations",
+            "description": "Develop separate configuration files and settings for development, staging, and production environments",
+            "dependencies": [
+              1
+            ],
+            "details": "Create .env templates for each environment (development, staging, production). Implement environment-specific configuration overrides. Add configuration inheritance and merging logic. Create validation rules specific to each environment. Implement configuration documentation and examples. Add environment detection and automatic configuration loading based on NODE_ENV.",
+            "status": "pending",
+            "testStrategy": "Test environment-specific configurations load correctly, validate configuration inheritance works properly, and verify environment detection accuracy"
+          },
+          {
+            "id": 3,
+            "title": "Implement Docker containerization and deployment scripts",
+            "description": "Create Docker containerization with multi-stage builds and automated deployment scripts",
+            "dependencies": [
+              2
+            ],
+            "details": "Create Dockerfile with multi-stage build for production optimization. Implement docker-compose.yml for local development and staging. Create deployment scripts for different environments. Add health check endpoints and container monitoring. Implement proper logging and error handling in containerized environment. Create CI/CD pipeline configuration for automated deployment.",
+            "status": "pending",
+            "testStrategy": "Test Docker builds succeed, container health checks work, deployment scripts execute correctly, and multi-environment deployment validation"
+          },
+          {
+            "id": 4,
+            "title": "Build secrets management and security system",
+            "description": "Implement secure handling of sensitive configuration data and secrets management",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement secrets encryption and decryption utilities. Create secure configuration handling for API keys and sensitive data. Add support for external secrets management systems (AWS Secrets Manager, HashiCorp Vault). Implement configuration masking and sanitization for logs. Create secure configuration validation and audit trails. Add rotation mechanisms for sensitive credentials.",
+            "status": "pending",
+            "testStrategy": "Test secrets encryption/decryption, validate configuration masking in logs, verify secure credential handling, and audit trail functionality"
+          },
+          {
+            "id": 5,
+            "title": "Create backup and restoration procedures",
+            "description": "Implement comprehensive backup and restoration system for Notion data and system state",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create automated backup scripts for Notion workspace data. Implement system state backup including configurations and databases. Add incremental backup functionality with versioning. Create restoration procedures with data validation. Implement backup scheduling and monitoring. Add backup encryption and secure storage. Create disaster recovery documentation and testing procedures.",
+            "status": "pending",
+            "testStrategy": "Test backup creation and validation, restoration procedures accuracy, backup scheduling reliability, and disaster recovery scenarios"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Implement monitoring, metrics, and observability dashboard",
+        "description": "Create comprehensive monitoring and observability tools for tracking system performance and workflow success",
+        "details": "Build monitoring dashboard using Express.js with real-time metrics display. Implement key metrics collection: workflow success rates, agent execution times, token usage, error rates, system resource usage. Add Prometheus ^15.1.0 integration for metrics collection and Grafana dashboard configuration. Implement workflow visualization showing current status and progress. Add performance profiling and bottleneck identification. Include cost tracking for API usage (Claude, Notion) with budget alerting. Create workflow analytics and success pattern identification.",
+        "testStrategy": "Test metrics collection accuracy, dashboard functionality, alert triggering, performance impact of monitoring, and cost tracking precision",
+        "priority": "low",
+        "dependencies": [
+          17
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Express.js monitoring dashboard server",
+            "description": "Set up Express.js server with routes for monitoring dashboard, real-time data endpoints, and WebSocket connections for live updates",
+            "dependencies": [],
+            "details": "Create Express.js server with /api/metrics, /api/workflows, /api/system endpoints. Implement WebSocket server for real-time updates using ws library. Add CORS configuration and basic authentication. Structure project with routes/, middleware/, and public/ directories for dashboard assets. Include health check endpoint and proper error handling middleware.",
+            "status": "pending",
+            "testStrategy": "Test server startup, endpoint responses, WebSocket connections, and basic authentication functionality"
+          },
+          {
+            "id": 2,
+            "title": "Implement core metrics collection system",
+            "description": "Build metrics collection infrastructure for workflow success rates, agent execution times, token usage, error rates, and system resource monitoring",
+            "dependencies": [
+              1
+            ],
+            "details": "Create MetricsCollector class with methods for tracking workflow events, agent performance, API usage, and system resources. Implement event listeners for workflow state changes, agent lifecycle events, and error occurrences. Add token usage tracking for Claude API calls and cost calculation. Include system resource monitoring using node os module for CPU, memory, and disk usage. Store metrics in time-series format with timestamps.",
+            "status": "pending",
+            "testStrategy": "Verify metrics accuracy, test event collection, validate token counting, and confirm system resource monitoring precision"
+          },
+          {
+            "id": 3,
+            "title": "Integrate Prometheus for metrics aggregation",
+            "description": "Add Prometheus client library integration for metrics export and configure Grafana dashboard for visualization",
+            "dependencies": [
+              2
+            ],
+            "details": "Install prom-client ^15.1.0 and create Prometheus metrics registry. Define custom metrics: workflow_success_rate, agent_execution_duration, token_usage_total, error_rate, system_cpu_usage, system_memory_usage. Implement /metrics endpoint for Prometheus scraping. Configure histogram buckets for timing metrics and counter increments for event tracking. Create Grafana dashboard JSON configuration with panels for all key metrics and alerting rules.",
+            "status": "pending",
+            "testStrategy": "Test Prometheus metrics export, Grafana dashboard functionality, metric accuracy, and alert rule triggering"
+          },
+          {
+            "id": 4,
+            "title": "Build workflow visualization system",
+            "description": "Create real-time workflow visualization showing current status, progress, and stage transitions with interactive dashboard",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement WorkflowVisualizer component using HTML5 Canvas or SVG for rendering workflow state diagrams. Show workflow stages (pending, bootstrapping, implementing, complete) with visual indicators. Add progress bars for each stage and real-time status updates via WebSocket. Include workflow timeline view showing stage durations and transitions. Add filtering and search capabilities for multiple concurrent workflows. Implement responsive design for different screen sizes.",
+            "status": "pending",
+            "testStrategy": "Test real-time updates, visual accuracy, user interactions, responsiveness, and multi-workflow display"
+          },
+          {
+            "id": 5,
+            "title": "Implement performance profiling and bottleneck identification",
+            "description": "Add performance profiling tools to identify bottlenecks in workflow execution and agent performance",
+            "dependencies": [
+              2
+            ],
+            "details": "Create PerformanceProfiler class using Node.js performance hooks and async_hooks for tracing. Implement execution time tracking for each workflow stage and agent operation. Add memory usage profiling and garbage collection monitoring. Create bottleneck detection algorithms analyzing execution patterns and resource usage spikes. Generate performance reports with recommendations for optimization. Include flame graph generation for detailed execution analysis.",
+            "status": "pending",
+            "testStrategy": "Verify profiling accuracy, test bottleneck detection, validate performance reports, and confirm minimal overhead impact"
+          },
+          {
+            "id": 6,
+            "title": "Implement cost tracking with budget alerting",
+            "description": "Build cost tracking system for API usage with budget monitoring, alerts, and usage optimization recommendations",
+            "dependencies": [
+              2
+            ],
+            "details": "Create CostTracker class monitoring Claude API token costs and Notion API usage. Implement cost calculation based on current pricing models and usage patterns. Add budget configuration and threshold alerting via email/webhook notifications. Create cost analytics showing usage trends, cost per workflow, and optimization opportunities. Implement usage forecasting based on historical data. Add cost allocation tracking by project or workflow type with detailed reporting.",
+            "status": "pending",
+            "testStrategy": "Test cost calculation accuracy, budget alert triggering, usage tracking precision, and forecasting reliability"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Create comprehensive documentation and user guides",
+        "description": "Develop complete documentation covering setup, usage, customization, and troubleshooting",
+        "details": "Create comprehensive documentation using Markdown and generate static site with VitePress ^1.0.0. Include: installation and setup guide, API documentation with OpenAPI 3.1 spec generation, workflow design patterns and best practices, troubleshooting guide with common issues and solutions, contribution guidelines for custom skills and MCPs. Add interactive examples and tutorials. Create video walkthroughs for complex workflows. Include performance tuning guide and cost optimization recommendations. Add FAQ section based on common user questions.",
+        "testStrategy": "Validate documentation completeness through user testing, verify all code examples work correctly, test installation procedures on clean environments, and gather feedback from beta users",
+        "priority": "low",
+        "dependencies": [
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up documentation structure and VitePress configuration",
+            "description": "Initialize VitePress project structure with navigation, themes, and build configuration for comprehensive documentation site",
+            "dependencies": [],
+            "details": "Install VitePress ^1.0.0 and create documentation directory structure with proper navigation. Configure vitepress config file with theme customization, navigation menus, and build settings. Set up markdown-it plugins for enhanced content rendering. Create base template files and establish folder organization for different documentation sections including guides, API docs, tutorials, and troubleshooting.",
+            "status": "pending",
+            "testStrategy": "Test VitePress build process, verify navigation works correctly, validate responsive design, and ensure all markdown features render properly"
+          },
+          {
+            "id": 2,
+            "title": "Generate API documentation with OpenAPI 3.1 specification",
+            "description": "Create comprehensive API documentation using OpenAPI 3.1 spec generation with interactive examples and code samples",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement OpenAPI 3.1 specification generation for all API endpoints including Notion integration, agent communication, and workflow management APIs. Use swagger-jsdoc and swagger-ui-express for documentation generation. Create interactive examples with real request/response data. Include authentication documentation, error codes, and rate limiting information. Generate code samples in multiple languages (JavaScript, Python, curl) for each endpoint.",
+            "status": "pending",
+            "testStrategy": "Validate OpenAPI spec compliance, test interactive examples functionality, verify code samples work correctly, and ensure all endpoints are documented with proper schemas"
+          },
+          {
+            "id": 3,
+            "title": "Create user guides and interactive tutorials with examples",
+            "description": "Develop comprehensive user guides covering setup, workflow creation, customization, and best practices with interactive examples",
+            "dependencies": [
+              1
+            ],
+            "details": "Write detailed user guides including installation and setup procedures, workflow design patterns, agent customization guides, and integration tutorials. Create interactive code examples and step-by-step tutorials for common use cases. Include screenshots, diagrams, and video walkthroughs for complex workflows. Add performance tuning recommendations and cost optimization strategies. Create contribution guidelines for custom skills and MCP development.",
+            "status": "pending",
+            "testStrategy": "Test all installation procedures on clean environments, verify code examples execute correctly, validate tutorial completeness through user testing, and gather feedback on clarity and usefulness"
+          },
+          {
+            "id": 4,
+            "title": "Compile troubleshooting guides and FAQ documentation",
+            "description": "Create comprehensive troubleshooting documentation and FAQ section based on common issues and user questions",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Develop troubleshooting guides covering common setup issues, integration problems, performance bottlenecks, and error resolution. Create FAQ section addressing frequent user questions about functionality, limitations, and best practices. Include diagnostic tools and debugging techniques. Add error code reference with solutions and workarounds. Create community support guidelines and issue reporting templates.",
+            "status": "pending",
+            "testStrategy": "Validate troubleshooting steps resolve documented issues, test diagnostic procedures on various environments, verify FAQ answers are accurate and helpful, and ensure error scenarios are properly covered"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Conduct integration testing and production readiness validation",
+        "description": "Perform comprehensive testing across all system components and validate production readiness",
+        "details": "Create comprehensive integration test suite using Jest ^29.7.0 and Supertest ^6.3.3. Implement end-to-end tests covering complete workflows from feature request to code delivery. Add performance testing with autocannon ^7.15.0 for load testing webhook endpoints and agent coordination. Create chaos engineering tests for failure scenarios and recovery validation. Implement security testing for webhook validation, secret handling, and input sanitization. Add compatibility testing across different repository types and codebase structures. Include user acceptance testing scenarios with real-world feature requests.",
+        "testStrategy": "Execute full test suite with >90% coverage, validate performance under load, verify security measures, test failure recovery scenarios, and conduct user acceptance testing with stakeholders",
+        "priority": "high",
+        "dependencies": [
+          19
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create integration test suite with Jest and Supertest",
+            "description": "Set up comprehensive integration testing framework using Jest ^29.7.0 and Supertest ^6.3.3 for API endpoint testing",
+            "dependencies": [],
+            "details": "Install and configure Jest and Supertest dependencies. Create test configuration files and setup scripts. Implement integration tests for all API endpoints including webhook handlers, agent coordination endpoints, and feature request processing. Add test utilities for database seeding, mock data generation, and test environment cleanup. Configure test coverage reporting and CI integration.",
+            "status": "pending",
+            "testStrategy": "Validate integration test coverage >85%, verify all API endpoints respond correctly, test database transactions and cleanup procedures"
+          },
+          {
+            "id": 2,
+            "title": "Implement end-to-end workflow testing",
+            "description": "Create comprehensive end-to-end tests covering complete workflows from feature request to code delivery",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and implement end-to-end test scenarios that simulate real user workflows. Test complete feature request processing including webhook reception, agent coordination, code generation, and delivery. Create test scenarios for different repository types and feature complexities. Implement automated verification of generated code quality and functionality. Add test data management and workflow state validation.",
+            "status": "pending",
+            "testStrategy": "Execute full workflow tests with real repositories, validate code generation quality, verify delivery mechanisms, and test workflow completion rates"
+          },
+          {
+            "id": 3,
+            "title": "Add performance testing with autocannon",
+            "description": "Implement performance and load testing using autocannon ^7.15.0 for webhook endpoints and agent coordination",
+            "dependencies": [
+              1
+            ],
+            "details": "Install and configure autocannon for load testing. Create performance test suites for webhook endpoints under various load conditions. Test agent coordination performance with concurrent requests. Implement performance benchmarking and regression testing. Add memory usage monitoring and resource utilization tracking. Create performance reports and alerting for degradation detection.",
+            "status": "pending",
+            "testStrategy": "Test system performance under 100+ concurrent requests, validate response times <500ms, monitor memory usage and identify bottlenecks"
+          },
+          {
+            "id": 4,
+            "title": "Create chaos engineering and failure testing",
+            "description": "Implement chaos engineering tests for failure scenarios and system recovery validation",
+            "dependencies": [
+              2
+            ],
+            "details": "Design chaos engineering test scenarios including network failures, service outages, and resource exhaustion. Implement automated failure injection and recovery testing. Test system resilience with partial component failures and degraded performance conditions. Add monitoring and alerting validation during failure scenarios. Create recovery time measurement and disaster recovery testing procedures.",
+            "status": "pending",
+            "testStrategy": "Validate system recovery from various failure modes, test graceful degradation, verify data consistency during failures, and measure recovery times"
+          },
+          {
+            "id": 5,
+            "title": "Implement security testing for webhooks and input validation",
+            "description": "Create comprehensive security testing for webhook validation, secret handling, and input sanitization",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement security test suite covering webhook signature validation, secret management security, and input sanitization effectiveness. Test for common vulnerabilities including injection attacks, authentication bypass, and data exposure. Add penetration testing automation for API endpoints. Implement security scanning for dependencies and configuration. Create threat modeling validation tests and security compliance verification.",
+            "status": "pending",
+            "testStrategy": "Execute security penetration tests, validate webhook signature verification, test input sanitization against injection attacks, and verify secret handling security"
+          },
+          {
+            "id": 6,
+            "title": "Add compatibility testing across repository types",
+            "description": "Implement compatibility testing across different repository types and codebase structures",
+            "dependencies": [
+              2
+            ],
+            "details": "Create test suites for various repository types including monorepos, microservices, and different language ecosystems. Test compatibility with different Git hosting providers and repository configurations. Implement automated testing with sample repositories of varying complexity and structure. Add validation for different coding patterns and architectural styles. Create compatibility matrix reporting and issue tracking.",
+            "status": "pending",
+            "testStrategy": "Test with 10+ different repository structures, validate feature generation across languages, verify Git operations compatibility, and document any limitations"
+          },
+          {
+            "id": 7,
+            "title": "Conduct user acceptance testing with real-world scenarios",
+            "description": "Execute user acceptance testing scenarios with real-world feature requests and stakeholder validation",
+            "dependencies": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "details": "Design user acceptance test scenarios based on real-world feature requests and use cases. Coordinate with stakeholders for testing validation and feedback collection. Implement automated user journey testing and satisfaction metrics tracking. Create test documentation and user feedback integration processes. Add production readiness checklist validation and go-live criteria verification.",
+            "status": "pending",
+            "testStrategy": "Execute UAT with 5+ real feature requests, collect stakeholder feedback, validate business requirements fulfillment, and confirm production readiness criteria"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-26T20:27:18.098Z",
+      "updated": "2025-10-26T20:46:17.003Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

@@ -1,0 +1,173 @@
+{
+	"meta": {
+		"generatedAt": "2025-10-26T20:34:04.001Z",
+		"tasksAnalyzed": 20,
+		"totalTasks": 20,
+		"analysisCount": 20,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Set up project foundation and development environment",
+			"complexityScore": 3,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down project setup into: package.json initialization with dependencies, TypeScript configuration, development tooling setup (ESLint/Prettier/Jest), project structure creation, and git repository initialization with proper .gitignore",
+			"reasoning": "Standard project setup with well-defined tools and patterns. Straightforward configuration tasks with clear documentation available."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Design and implement Notion database schemas",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into: Workflows database design and creation, Stage Pages database with relations, Subagent Tasks database implementation, and database templates and validation setup",
+			"reasoning": "Moderate complexity due to relational database design in Notion, API integration requirements, and need for proper schema validation and templates."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Implement Notion API integration layer",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break into: NotionService class foundation, CRUD operations implementation, error handling and rate limiting, TypeScript interfaces and types, webhook signature verification, and logging and configuration setup",
+			"reasoning": "High complexity due to API integration challenges, rate limiting handling, webhook security, and need for robust error handling patterns."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Build orchestration server with webhook handling",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Separate into: Express server setup and middleware, webhook endpoint implementation, webhook signature validation, agent spawning logic, security and rate limiting, environment configuration, and process lifecycle management",
+			"reasoning": "High complexity involving server architecture, security concerns, process management, and coordination between multiple system components."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Implement Bootstrapper agent core functionality",
+			"complexityScore": 9,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Divide into: BootstrapperAgent class foundation, codebase scanning and file analysis, AST parsing implementation, dependency analysis with cruiser, Claude API integration, workflow specification generation, repository pattern detection, and Notion output formatting",
+			"reasoning": "Very high complexity involving AI integration, codebase analysis, AST parsing, and intelligent pattern recognition across multiple programming languages."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Create simple Implementer agent for MVP",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into: ImplementerAgent class setup, file modification logic with backup, git operations integration, Claude API for code generation, change validation and testing, and Notion result reporting",
+			"reasoning": "High complexity due to code generation, git operations, change validation, and need for robust rollback mechanisms."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Implement end-to-end workflow orchestration for MVP",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Separate into: state machine implementation, Bootstrapper to Implementer flow, error handling and recovery, workflow status tracking, timeout management with cron, logging and monitoring, and cleanup mechanisms",
+			"reasoning": "High complexity involving state management, error recovery, timing coordination, and integration of multiple agent types."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Develop Planner agent for three-stage workflow",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Divide into: PlannerAgent class foundation, specification generation for APIs/schemas, architectural analysis with madge, Claude API planning integration, specification validation, detailed task breakdown generation, and Notion output formatting",
+			"reasoning": "High complexity requiring architectural analysis, AI-driven planning, specification generation, and coordination between exploration and implementation phases."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Update orchestration for three-stage pipeline",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break into: state machine extension for planning stage, conditional stage execution logic, state persistence in Notion, webhook handling updates, and workflow specification validation",
+			"reasoning": "Moderate complexity building on existing orchestration with additional state management and conditional logic."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Implement subagent task management system",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Separate into: SubagentTaskManager class, parallel execution with Promise handling, task result synthesis, subagent configuration validation, dependency resolution with topological sorting, and error handling for partial failures",
+			"reasoning": "High complexity involving parallel processing, dependency resolution, result synthesis, and coordination of multiple concurrent agents."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Build Git worktree management system",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into: GitWorktreeManager class implementation, worktree creation and naming conventions, cleanup and lifecycle management, multi-repository support, and error handling for git operations",
+			"reasoning": "Moderate complexity involving git operations, file system management, and proper cleanup handling across multiple repositories."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Enhance Implementer agents for parallel execution in worktrees",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break into: ImplementerAgent refactoring for worktrees, worktree context isolation, parallel execution support, cross-worktree coordination, change tracking and diff generation, PR/MR creation with octokit, and change validation in worktrees",
+			"reasoning": "High complexity involving parallel processing, git worktree management, cross-worktree coordination, and integration with GitHub/GitLab APIs."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Implement multi-repository support and coordination",
+			"complexityScore": 9,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Separate into: multi-repo management extension, CrossRepoCoordinator implementation, repository discovery and configuration, cross-repo context sharing, plugin architecture for different repo types, cross-repo validation, rollback coordination, and repository provider integrations",
+			"reasoning": "Very high complexity involving coordination across multiple repositories, plugin architecture, and complex rollback scenarios."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Integrate Claude Skills system for dynamic expertise loading",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Divide into: SkillsManager implementation, skill discovery and mapping system, public and custom skill support, skill combination and conflict resolution, skill validation and format checking, and dynamic loading in agent spawning",
+			"reasoning": "High complexity involving file system operations, skill conflict resolution, dynamic loading mechanisms, and integration with agent spawning."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Develop MCP server integrations for specialized capabilities",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break into: Codebase Search MCP server development, Pattern Analysis MCP implementation, Cross-Repo Search MCP creation, MCP server discovery and configuration, error handling and timeout management, health checking and fallback mechanisms, and documentation and examples",
+			"reasoning": "High complexity involving custom MCP server development, AST analysis, semantic search implementation, and distributed system coordination."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Add comprehensive error handling and recovery mechanisms",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Separate into: custom error classes and types, structured logging with winston, distributed tracing with opentelemetry, retry logic with exponential backoff, health checks for all components, and workflow recovery mechanisms",
+			"reasoning": "High complexity requiring comprehensive error taxonomy, distributed tracing, recovery mechanisms, and integration across all system components."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Create configuration management and deployment system",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into: configuration management with dotenv and joi validation, environment-specific configurations, Docker containerization and deployment scripts, secrets management and security, and backup and restoration procedures",
+			"reasoning": "Moderate complexity involving standard DevOps practices, containerization, and security considerations for secrets management."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Implement monitoring, metrics, and observability dashboard",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break into: monitoring dashboard with Express, metrics collection implementation, Prometheus and Grafana integration, workflow visualization, performance profiling and bottleneck identification, and cost tracking with budget alerting",
+			"reasoning": "High complexity involving real-time monitoring, metrics aggregation, visualization, and performance analysis across distributed components."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Create comprehensive documentation and user guides",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Separate into: documentation structure and VitePress setup, API documentation with OpenAPI generation, user guides and tutorials with examples, and troubleshooting guides and FAQ compilation",
+			"reasoning": "Moderate complexity involving documentation tooling, example creation, and comprehensive coverage of all system features."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "Conduct integration testing and production readiness validation",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Divide into: integration test suite with Jest and Supertest, end-to-end workflow testing, performance testing with autocannon, chaos engineering and failure testing, security testing for webhooks and input validation, compatibility testing across repository types, and user acceptance testing",
+			"reasoning": "High complexity requiring comprehensive testing strategies, performance validation, security testing, and coordination of testing across all system components."
+		}
+	]
+}
