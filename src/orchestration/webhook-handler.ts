@@ -5,6 +5,7 @@
 
 import { createLogger } from '../utils/logger';
 import { AgentSpawner } from './agent-spawner';
+import { AgentFlowCoordinator } from './agent-flow-coordinator';
 import type { WebhookPayload } from '../utils/webhook';
 
 const logger = createLogger('WebhookHandler');
@@ -22,9 +23,29 @@ export interface ExtendedWebhookPayload extends WebhookPayload {
 
 export class WebhookHandler {
   private agentSpawner: AgentSpawner;
+  private flowCoordinator: AgentFlowCoordinator | null = null;
 
   constructor() {
     this.agentSpawner = new AgentSpawner();
+
+    // Initialize flow coordinator if API keys are available
+    const notionKey = process.env['NOTION_API_KEY'];
+    const claudeKey = process.env['CLAUDE_API_KEY'];
+
+    if (notionKey && claudeKey) {
+      this.flowCoordinator = new AgentFlowCoordinator({
+        notionApiKey: notionKey,
+        claudeApiKey: claudeKey,
+        databaseIds: {
+          workflowsDbId: process.env['NOTION_WORKFLOWS_DB_ID'] || '',
+          stagePagesDbId: process.env['NOTION_STAGE_PAGES_DB_ID'] || '',
+          subagentTasksDbId: process.env['NOTION_SUBAGENT_TASKS_DB_ID'] || '',
+        },
+      });
+      logger.info('Flow coordinator initialized');
+    } else {
+      logger.warn('Flow coordinator not initialized - missing API keys');
+    }
   }
 
   /**
@@ -107,14 +128,22 @@ export class WebhookHandler {
   private startWorkflow(workflowId: string): void {
     logger.info('Starting workflow', { workflowId });
 
-    this.agentSpawner.spawnAgent({
-      type: 'bootstrapper',
-      workflowId,
-      config: {
-        skills: [],
-        mcps: ['codebase_search'],
-      },
-    });
+    // Use flow coordinator if available, otherwise fall back to direct spawning
+    if (this.flowCoordinator) {
+      this.flowCoordinator.startWorkflow(workflowId).catch((error: unknown) => {
+        logger.error('Flow coordinator failed to start workflow', { workflowId, error });
+      });
+    } else {
+      // Fallback to direct agent spawning
+      this.agentSpawner.spawnAgent({
+        type: 'bootstrapper',
+        workflowId,
+        config: {
+          skills: [],
+          mcps: ['codebase_search'],
+        },
+      });
+    }
   }
 
   /**
