@@ -1612,11 +1612,26 @@
             "testStrategy": "Execute UAT with 5+ real feature requests, collect stakeholder feedback, validate business requirements fulfillment, and confirm production readiness criteria"
           }
         ]
+      },
+      {
+        "id": 21,
+        "title": "Create manual integration tests and examples to verify the end-to-end workflow",
+        "description": "Build comprehensive manual integration tests with example scripts, sample workflows, and verification utilities to validate the complete workflow system from Notion webhooks through agent coordination to code generation",
+        "details": "Create a comprehensive manual testing suite using Jest ^29.7.0 and Supertest ^7.1.4. Build test utilities in `tests/integration/` directory: 1) Mock Notion webhook simulator that generates realistic payloads for workflow creation, status updates, and task assignments. 2) Sample workflow generator that creates test scenarios running Bootstrapper on this codebase using dependency-cruiser ^17.1.0 and @babel/parser ^7.28.5 for analysis. 3) Implementer verification script that demonstrates simple code generation with Claude API integration and file modification validation. 4) State machine transition tester using WorkflowStateMachine class to verify all valid transitions (pending→bootstrapping→planning→implementing→complete) and error handling for invalid transitions. 5) Error handling and retry mechanisms tester that simulates API failures, network timeouts, and recovery scenarios with proper logging using winston ^3.11.0. 6) Integration test orchestrator that runs complete end-to-end scenarios. Create documentation in `docs/manual-testing/` with step-by-step guides, setup instructions, expected outputs, and troubleshooting procedures. Include example configurations for different testing scenarios and verification checklists.",
+        "testStrategy": "Execute manual test suite with complete workflow scenarios, verify webhook processing accuracy, validate state machine transitions, test error handling robustness, confirm code generation quality, and validate documentation completeness through user testing",
+        "status": "done",
+        "dependencies": [
+          7,
+          18,
+          20
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-10-26T20:27:18.098Z",
-      "updated": "2025-10-27T00:01:01.646Z",
+      "updated": "2025-10-27T00:12:15.441Z",
       "description": "Tasks for master context"
     }
   }
