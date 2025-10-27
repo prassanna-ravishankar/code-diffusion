@@ -205,3 +205,122 @@ npm run test:integration:manual
 ```
 
 This will execute all test scripts and provide a summary report.
+
+---
+
+## Real API Integration Tests
+
+The tests above use mock/simulated data. To test with **real API keys** and see actual output:
+
+### Test 8: Real Notion API Integration
+
+**Purpose**: Verify Notion API setup and database access with real credentials.
+
+**Steps**:
+```bash
+node examples/test-real-notion.js
+```
+
+**Expected Output**:
+- ✅ API connection authenticated
+- ✅ Test workflow created in Notion
+- ✅ Test stage page created
+- ✅ Test subagent task created
+- ✅ Data queried successfully
+- ✅ Status updates working
+- ✅ Cleanup complete
+
+**What this tests**: Complete Notion CRUD operations with real API.
+
+---
+
+### Test 9: Real Bootstrapper with Claude
+
+**Purpose**: Run Bootstrapper agent with real Claude API to analyze codebase.
+
+**Steps**:
+```bash
+node examples/test-real-bootstrapper.js
+```
+
+**Expected Output**:
+- ✅ Codebase scanned (file counts, sizes)
+- ✅ Claude AI analysis complete (30-60 seconds)
+- ✅ Workflow specification generated
+- ✅ Project details identified:
+  - Languages detected
+  - Frameworks identified
+  - Architecture assessed
+  - Key files found
+  - Suggested tasks generated
+- ✅ Output saved to .code-diffusion/workflows/
+
+**What this tests**: Real AI-powered codebase analysis and specification generation.
+
+---
+
+### Test 10: Real End-to-End Workflow
+
+**Purpose**: Run complete workflow with real Notion and Claude APIs.
+
+**Steps**:
+```bash
+node examples/test-real-workflow.js
+```
+
+**Expected Output**:
+- ✅ Workflow created in Notion database
+- ✅ AgentFlowCoordinator started
+- ✅ Bootstrapper agent spawned and executed
+- ✅ Real-time progress monitoring
+- ✅ State transitions logged
+- ✅ Workflow completes or blocks with clear status
+- ✅ Results visible in Notion
+
+**What this tests**: Complete end-to-end workflow with real integrations.
+
+---
+
+## Running Real Tests
+
+**Prerequisites for Real Tests**:
+
+1. **Set up Notion Integration**:
+   - Go to https://www.notion.so/my-integrations
+   - Create a new integration
+   - Copy the Internal Integration Token
+   - Add to .env as `NOTION_API_KEY`
+
+2. **Create Notion Databases**:
+   - Create three databases in Notion
+   - Share each with your integration
+   - Copy database IDs to .env:
+     - `NOTION_WORKFLOWS_DB_ID`
+     - `NOTION_STAGE_PAGES_DB_ID`
+     - `NOTION_SUBAGENT_TASKS_DB_ID`
+
+3. **Set Claude API Key**:
+   - Get API key from https://console.anthropic.com
+   - Add to .env as `CLAUDE_API_KEY` or `ANTHROPIC_API_KEY`
+
+4. **Build Project**:
+   ```bash
+   npm run build
+   ```
+
+5. **Run Tests**:
+   ```bash
+   # Test Notion setup first
+   node examples/test-real-notion.js
+
+   # Then test Bootstrapper
+   node examples/test-real-bootstrapper.js
+
+   # Finally, test full workflow
+   node examples/test-real-workflow.js
+   ```
+
+**Recommended Test Order**:
+1. Start with `test-real-notion.js` - fastest, validates Notion setup
+2. Then `test-real-bootstrapper.js` - validates Claude API and codebase analysis
+3. Finally `test-real-workflow.js` - full integration test
